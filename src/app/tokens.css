@@ -1,0 +1,40 @@
+/* Shared UI roles. Event artwork and the photographic hero keep their own palette. */
+:root {
+  --ink: #182b40;
+  --muted: #52657a;
+  --text-info: #3f607e;
+  --text-on-color: #ffffff;
+  --blue: #1666ba;
+  --blue-dark: #105599;
+  --blue-soft: #edf5fd;
+  --brand-ink: #164d80;
+  --brand-light: #277bb7;
+  --icon: #526f8a;
+  --focus: #1666ba;
+  --surface: #ffffff;
+  --surface-subtle: #f0f4f8;
+  --surface-info: #eaf2fa;
+  --background: #f7f9fc;
+  --line: #dce5ee;
+  --line-strong: #b5c9dd;
+  --field-border: #8193a7;
+  --progress-pending-text: var(--muted);
+  --progress-pending-surface: var(--surface-subtle);
+  --green: #1d754f;
+  --surface-success: #eaf6f0;
+  --warning: #805014;
+  --line-warning: #eedecc;
+  --danger: #a52e36;
+  --surface-danger: #fff5f4;
+  --line-danger: #ce8b90;
+  --radius: 12px;
+  --focus-on-dark: #ffffff;
+  /* Thai-first type scale: 14px is the floor for body-level Thai text, 13px only for non-essential labels. */
+  --fs-xs: 13px;
+  --fs-sm: 14px;
+  --fs-base: 15px;
+  --fs-md: 16px;
+  --font-thai: "Noto Sans Thai", "Leelawadee UI", Tahoma, "Segoe UI", sans-serif;
+  /* Numerals and the baht sign (฿) come from a Thai-capable font, never bare Arial. */
+  --font-num: "Noto Sans Thai", "Leelawadee UI", Tahoma, Arial, sans-serif;
+}

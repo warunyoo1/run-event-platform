@@ -1,0 +1,12 @@
+/* Keep the hero zoom inside the image area, preserving the overlapping search. */
+.hero-media { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .reg-step-number { transition: color 180ms, background-color 180ms, border-color 180ms; }
+  .reg-delivery-method label { transition: background-color 180ms, border-color 180ms, box-shadow 180ms; }
+  .button { transition: background-color 180ms, border-color 180ms, color 180ms, box-shadow 180ms; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

@@ -1,0 +1,43 @@
+# dependencies
+node_modules/
+.npm-cache/
+.pnp
+.pnp.js
+
+# Next.js build output
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# environment variables
+.env*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# deployment
+.vercel/
+
+# test output
+coverage/
+test-results/
+playwright-report/
+
+# generated artifacts (screenshots, detector output)
+artifacts/
+
+# agent working files (task reports); skills stay tracked
+.agents/tasks/

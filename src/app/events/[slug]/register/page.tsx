@@ -1,0 +1,18 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { CalendarClock } from "lucide-react";
+import { displayName, events, getEvent, statusLabels } from "@/lib/events";
+import { RegistrationForm } from "@/components/registration-form";
+import "@/app/registration.css";
+
+export function generateStaticParams() { return events.map((event) => ({ slug: event.slug })); }
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const event = getEvent((await params).slug);
+  return { title: event ? `สมัคร ${displayName(event)}` : "ไม่พบกิจกรรม" };
+}
+export default async function RegisterPage({ params }: { params: Promise<{ slug: string }> }) {
+  const event = getEvent((await params).slug);
+  if (!event) notFound();
+  if (event.status !== "open") return <div className="container empty-state not-found"><CalendarClock size={36} /><h1>{statusLabels[event.status]}</h1><p>{displayName(event)} {event.status === "closed" ? "ปิดรับสมัครแล้ว" : "ยังไม่เปิดรับสมัคร กรุณาติดตามประกาศจากผู้จัด"}</p><Link className="button button-primary" href={`/events/${event.slug}`}>กลับไปดูรายละเอียดงาน</Link></div>;
+  return <RegistrationForm key={event.id} event={event} currentYear={new Date().getFullYear()} />;
+}
