@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import type { RunningEvent } from "@/lib/events";
 
 const artwork: Record<RunningEvent["theme"], { title: string; subtitle: string }> = {
@@ -10,7 +12,11 @@ const artwork: Record<RunningEvent["theme"], { title: string; subtitle: string }
 };
 
 export function EventPoster({ event, large = false }: { event: RunningEvent; large?: boolean }) {
-  const text = artwork[event.theme];
+  const [failed, setFailed] = useState(false);
+  const images = [...(event.images ?? [])].sort((a,b) => a.sortOrder - b.sortOrder);
+  const cover = images.find((image) => image.kind === "cover") ?? images.find((image) => image.kind === "poster") ?? images[0];
+  if (cover && !failed) return <div className={`event-poster poster-${event.theme} ${large ? "poster-large" : ""}`}><img src={cover.url} alt={cover.alt || event.name} onError={() => setFailed(true)} style={{width:"100%",height:"100%",objectFit:"cover"}} /></div>;
+  const text = { title: event.name, subtitle: new Intl.DateTimeFormat("th-TH", { month: "long", year: "numeric", timeZone: "Asia/Bangkok" }).format(new Date(`${event.date}T12:00:00+07:00`)) };
   return <div className={`event-poster poster-${event.theme} ${large ? "poster-large" : ""}`} aria-hidden="true">
     <div className="poster-top"><span>Run Event presents</span></div>
     <div className="poster-title"><strong>{text.title}</strong><span>{text.subtitle}</span></div>

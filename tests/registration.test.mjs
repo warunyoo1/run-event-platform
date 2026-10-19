@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { events, displayName } from "../src/lib/events.ts";
+import { displayName } from "../src/lib/events.ts";
+import { events } from "./fixtures/events.ts";
 import { emptyParticipant, emptyDelivery, validateParticipant, validateDelivery, registrationTotal, createDemoReceipt, provinces } from "../src/lib/registration.ts";
 
 const event = events[0];

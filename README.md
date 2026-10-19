@@ -1,58 +1,38 @@
 # Run Event Platform
 
-หน้าเว็บสาธารณะสำหรับดูและค้นหาข้อมูลงานวิ่ง ออกแบบโดยอิงรูปแบบรายการงานของ [RUNRACE](https://runrace.in.th/) และใช้ Next.js + React + TypeScript เช่นเดียวกับ `running-event-admin`
+Public Next.js frontend connected to `running-event-api`.
 
-## เริ่มใช้งาน
+## Run
 
-```sh
-npm ci
-npm run dev
+Copy `.env.example` to `.env.local`. Set `API_PROXY_TARGET` to the API origin (no trailing slash). Run `npm ci` then `npm run dev` (port 3001).
+
+The browser calls `/api/v1/public/*` through a Next rewrite. Server event pages use the same configured API target directly. Restart/rebuild after changing the target. No admin credentials are needed by the public app, and admin routes are not proxied.
+
+## Connected flows
+
+- Event catalogue and saved-event catalogue load published API events. Search/filter/sort runs on that complete list; saved IDs remain in localStorage.
+- Event details, images, available race quotas, registration page and calendar load from the API. Draft and archived visibility is decided by the API. Missing event is a 404; connection errors show a retry page.
+- Registration sends participants and delivery to `POST /events/:slug/orders`. The API calculates the final amount. The receipt uses the returned order number, total and expiry. Personal form values are cleared after success and never stored in browser storage.
+- Lookup requires order number plus contact phone last four digits. Returned `canUploadSlip` controls multipart slip upload. Rejected slips can be resubmitted when the API allows it.
+- QR/account/payment recipient configuration is intentionally deferred. The app does not invent payment instructions or process payments.
+
+`NEXT_PUBLIC_SHIPPING_FEE` is the estimate shown before checkout (default 50); keep it aligned with API `SHIPPING_FEE`. The server-returned amount is authoritative. A network failure after checkout can be ambiguous: never assume no order was created.
+
+Public lookup currently exposes no BIB or tracking fields because the existing API does not return them. No API behavior was changed.
+
+## Checks
+
+`npm run typecheck`, `npm run build`, `npm test`.
+
+For isolated HTTP integration tests (no real orders):
+
+```powershell
+postman simulation run postman/simulations/public-checkout.sim.yaml --port 4900 --no-history --output ndjson
+# In another terminal:
+$env:SIMULATION_API_URL = "http://127.0.0.1:4900/running"
+npm test
 ```
 
-เปิด http://localhost:3001 (แยก port จากแอดมิน)
+The local mock is based on the checked-in API route/validator/view contract, not a published workspace mock. It covers event listing/detail, create, lookup, multipart submission and 404/409 errors. It does not replace backend tests for quota concurrency, magic-byte validation, database persistence or expiry.
 
-```sh
-npm run typecheck
-npm run build
-npm start
-```
-
-## หน้าที่มี
-
-- `/` หน้าหลัก พร้อมค้นหางานวิ่ง
-- `/events` รายการงาน ค้นหาชื่อ/สถานที่ กรองจังหวัด เดือน ระยะ ประเภท และสถานะ เรียงตามวัน/ราคา ดูแบบการ์ดหรือรายการ
-- `/events/[slug]` รายละเอียด ระยะและค่าสมัคร กำหนดการ สถานที่ และดาวน์โหลดปฏิทิน `.ics`
-- `/events/[slug]/register` ฟอร์มสมัครตัวอย่าง 4 ขั้นตอน เพิ่ม/แก้ไข/ลบผู้สมัครสูงสุด 20 คน เลือกระยะของงาน ไซซ์เสื้อ ติดต่อ และรับเอง/จัดส่ง (50 บาทต่อใบสมัคร) คำนวณยอดและสร้างใบสมัครทดลอง สถานะ closed/upcoming จะไม่แสดงฟอร์ม
-- `/saved` งานที่บันทึกใน localStorage ของเบราว์เซอร์เครื่องนั้น ไม่มีการซิงก์ข้ามเครื่อง
-- `/how-it-works` คู่มือนักวิ่ง
-- `/how-to-register` ขั้นตอนการทดลองสมัคร
-- `/find-order` ค้นหาใบสมัครทดลองที่สร้างในแท็บเดียวกัน หรือใช้เลขตัวอย่าง `DEMO-1001` ไม่มีข้อมูลผู้สมัครจริง
-- `/about` เกี่ยวกับ Run Event และขอบเขตรุ่นสาธิต
-
-เมนูหลักตามเว็บอ้างอิง: กิจกรรม / ขั้นตอนการสมัคร / ค้นหาใบสมัคร / เกี่ยวกับเรา พร้อมไอคอนและเมนูยุบสำหรับมือถือ
-
-ตัวกรองเก็บใน URL เพื่อแชร์หรือเปิดย้อนกลับได้ เว็บไซต์รองรับภาษาไทยและมือถือ
-
-## Animation
-
-ใช้ `gsap` + `@gsap/react` ใน `src/lib/motion.ts` สำหรับหน้าแรก เมนูมือถือ การเปลี่ยนผลค้นหา การเปลี่ยนขั้นตอนสมัคร และการเลื่อนหา section/หัวข้อฟอร์ม ใช้ ScrollTrigger กับส่วนคู่มือบนหน้าแรก และ ScrollToPlugin เฉพาะการเลื่อนที่ผู้ใช้เรียกผ่านปุ่ม/ลิงก์ ไม่เปลี่ยน native wheel/touch scrolling
-
-แอนิเมชันผูกกับ component scope และ cleanup เมื่อเปลี่ยนหน้า รองรับ `prefers-reduced-motion` รวมถึงเมื่อเปลี่ยนค่าระหว่างใช้งาน
-
-## ข้อมูลและการเชื่อมต่อแอดมิน
-
-ขณะนี้เป็น **UI สาธิต** ใช้ข้อมูลใน `src/lib/events.ts` มีฟอร์มทดลองสมัคร แต่ยังไม่มี API, การจองสิทธิ์, การชำระเงินจริง หรือการซิงก์กับแอดมิน งานและค่าสมัครทั้งหมดเป็นข้อมูลตัวอย่าง ไม่ได้ดึงจาก RUNRACE
-
-ข้อมูลส่วนตัวในแบบฟอร์ม (ชื่อ วันเกิด เลขบัตร เบอร์โทร สุขภาพ ผู้ติดต่อฉุกเฉิน และที่อยู่) อยู่ใน React memory เท่านั้น ไม่บันทึกลง localStorage/sessionStorage และล้างออกเมื่อยืนยันสำเร็จหรือออกจากหน้า การรีโหลดระหว่างกรอกจะทำให้ข้อมูลหาย เก็บเฉพาะใบรับตัวอย่างที่ไม่มีข้อมูลส่วนตัว (เลขใบสมัคร slug งาน ระยะ/ไซซ์ ยอดรวม วิธีรับอุปกรณ์ และสถานะ pending) ใน sessionStorage สำหรับทดสอบหน้าค้นหาแท็บเดียวกัน ปิดแท็บแล้วไม่รับประกันการกู้คืน ไม่มีการอัปโหลดหลักฐานหรือสร้าง QR รับเงิน
-
-ใช้ `npm test` ตรวจการตรวจข้อมูล วันเกิด เบอร์โทร ระยะที่เลือก ยอดรวม ค่าส่งต่อใบสมัคร และการไม่ใส่ข้อมูลส่วนตัวในใบรับตัวอย่าง
-
-ข้อมูลฐาน `id`, `name`, `slug`, `date`, `venue` และ `races` ใช้รูปแบบเดียวกับแอดมิน และงาน Bangkok/Khao Yai ใช้ ID, slug, ราคา และโควตาตรงกัน ส่วน `province`, `category`, `subtitle`, `description`, `registrationEnds`, `organizer` และเวลาปล่อยตัวเป็นข้อมูลสาธารณะที่เพิ่มใน UI นี้
-
-เมื่อมี API กลาง ให้แทนที่ข้อมูลตัวอย่างด้วย public event endpoint ที่ส่งเฉพาะงานเผยแพร่แล้ว **ห้ามนำสถานะ `draft` ของแอดมินไปแปลงเป็น `upcoming` อัตโนมัติ** งานแบบร่างต้องไม่ปรากฏต่อสาธารณะ ส่วน `upcoming` ใช้กับงานที่เผยแพร่แล้วแต่ยังไม่เปิดรับสมัคร ข้อมูลผู้สมัคร ออเดอร์ และหลักฐานการชำระเงินต้องคงอยู่ในระบบที่มีการตรวจสอบสิทธิ์
-
-ข้อมูลตัวอย่างเพิ่ม 4 งานเพื่อแสดงรูปแบบสถานะและประเภท ไม่ได้มีในแอดมิน ข้อมูลแอดมินที่แก้ใน localStorage จะไม่ส่งมาถึง repo นี้ เพราะแยก origin และยังไม่มี backend ร่วมกัน
-
-ไฟล์ภาพประกอบ `public/images/runners.jpg` จาก [Unsplash](https://unsplash.com/s/photos/marathon) (ภาพหมายเลข `photo-1613937574892-25f441264a09`) ใช้เป็นภาพบรรยากาศทั่วไป ไม่ใช่ภาพจากงานตัวอย่าง โปสเตอร์งานเป็น SVG/CSS ที่สร้างในโปรเจกต์ ไม่ใช้โลโก้หรือโปสเตอร์ของ RUNRACE
-
-Metadata ตั้ง `noindex` สำหรับรุ่นสาธิต ให้แก้เมื่อข้อมูลจริงและการเผยแพร่พร้อมใช้งาน
+Set `API_PROXY_TARGET=http://127.0.0.1:4900/running` to browse the app against the same simulation. Do not use this setting for production. No mock was published. The untracked nested `run-event-platform/` copy is not the active source and was left untouched.

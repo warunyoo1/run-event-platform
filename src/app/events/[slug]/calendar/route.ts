@@ -1,7 +1,9 @@
-import { displayName, getEvent } from "@/lib/events";
+import { findEvent } from "@/lib/api";
+export const dynamic = "force-dynamic";
+import { displayName } from "@/lib/events";
 const escape = (value: string) => value.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
-  const event = getEvent((await params).slug);
+  const event = await findEvent((await params).slug);
   if (!event) return new Response("Event not found", { status: 404 });
   // Use an all-day entry; individual race start times remain in the description.
   const start = event.date.replaceAll("-", "");

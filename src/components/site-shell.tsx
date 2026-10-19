@@ -84,5 +84,5 @@ export function Header() {
 }
 
 export function Footer() {
-  return <footer className="site-footer"><div className="container footer-main"><div><Brand /><p>ค้นหางานวิ่งที่ใช่ แล้วออกไปสร้างเรื่องราวของคุณ</p></div><div className="footer-links">{navigation.map(({ href, label }) => <Link href={href} key={href}>{label} <ArrowUpRight size={15} /></Link>)}</div></div><div className="container footer-bottom"><span>© 2026 Run Event</span><span>เว็บไซต์ตัวอย่าง · ข้อมูลงานและค่าสมัครใช้เพื่อสาธิต</span></div></footer>;
+  return <footer className="site-footer"><div className="container footer-main"><div><Brand /><p>ค้นหางานวิ่งที่ใช่ แล้วออกไปสร้างเรื่องราวของคุณ</p></div><div className="footer-links">{navigation.map(({ href, label }) => <Link href={href} key={href}>{label} <ArrowUpRight size={15} /></Link>)}</div></div><div className="container footer-bottom"><span>© 2026 Run Event</span><span>ข้อมูลกิจกรรมและการรับสมัครจากผู้จัด</span></div></footer>;
 }

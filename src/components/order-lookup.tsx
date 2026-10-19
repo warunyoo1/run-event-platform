@@ -1,33 +1,64 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { ArrowUpRight, FileSearch, Search } from "lucide-react";
-import { displayName, formatDate, getEvent, price } from "@/lib/events";
-import { readDemoReceipts, type DemoReceipt } from "@/lib/registration";
+import { ArrowUpRight, FileSearch, Search, Upload } from "lucide-react";
+import { displayName, formatDate, price } from "@/lib/events";
+import { findOrder, sendSlip, type PublicOrder } from "@/lib/api";
 
-const example: DemoReceipt = { reference: "DEMO-1001", eventSlug: "bangkok-morning-2027", races: [{ race: "5 KM", size: "M" }], amount: 399, delivery: "pickup", createdAt: "2026-10-15T00:00:00Z", status: "pending" };
-const findReceipt = (reference: string) => [example, ...readDemoReceipts()].find((receipt) => receipt.reference === reference.trim().toUpperCase() && getEvent(receipt.eventSlug)) || null;
-
+const labels = { pending: "รอชำระเงิน", slip_uploaded: "รอตรวจสลิป", paid: "ชำระเงินแล้ว", rejected: "สลิปไม่ผ่าน", expired: "หมดเวลาชำระเงิน", cancelled: "ยกเลิกแล้ว" };
 export function OrderLookup({ initialReference = "" }: { initialReference?: string }) {
   const [reference, setReference] = useState(initialReference);
-  const [result, setResult] = useState<DemoReceipt | "empty" | null>(null);
-  useEffect(() => {
-    setReference(initialReference);
-    setResult(initialReference ? findReceipt(initialReference) || "empty" : null);
-  }, [initialReference]);
-  const event = result && result !== "empty" ? getEvent(result.eventSlug) : undefined;
+  const [phone, setPhone] = useState("");
+  const [result, setResult] = useState<PublicOrder | null>(null);
+  const [lookup, setLookup] = useState<{ orderNo: string; phone: string } | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [pending, setPending] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const input = useRef<HTMLInputElement>(null);
+  async function search(event: FormEvent) {
+    event.preventDefault(); if (pending || uploading) return;
+    setPending(true); setError(""); setNotice(""); setResult(null); setFile(null);
+    try {
+      const orderNo = reference.trim().toUpperCase();
+      const order = await findOrder(orderNo, phone);
+      setResult(order); setLookup({ orderNo, phone });
+    } catch (error) { setError(error instanceof Error ? error.message : "ค้นหาไม่สำเร็จ"); }
+    finally { setPending(false); }
+  }
+  async function upload(event: FormEvent) {
+    event.preventDefault(); if (!file || !lookup || uploading) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size === 0) { setError("เลือกไฟล์ JPG, PNG หรือ WEBP ที่ไม่ว่างเปล่า"); return; }
+    if (file.size > 5 * 1024 * 1024) { setError("ไฟล์ต้องมีขนาดไม่เกิน 5 MB"); return; }
+    setUploading(true); setError(""); setNotice("");
+    let sent = false;
+    try {
+      await sendSlip(lookup.orderNo, lookup.phone, file); sent = true;
+      setNotice("ส่งสลิปแล้ว รอเจ้าหน้าที่ตรวจสอบ"); setFile(null); if (input.current) input.current.value = "";
+      setResult((current) => current ? { ...current, status: "slip_uploaded", canUploadSlip: false } : current);
+      setResult(await findOrder(lookup.orderNo, lookup.phone));
+    } catch (error) { setError(sent ? "ส่งสลิปสำเร็จ แต่โหลดสถานะล่าสุดไม่ได้ กรุณาค้นหาใบสมัครอีกครั้ง" : error instanceof Error ? error.message : "ส่งสลิปไม่สำเร็จ"); }
+    finally { setUploading(false); }
+  }
   return <div className="lookup-content">
-    <form className="lookup-form" onSubmit={(e) => { e.preventDefault(); setResult(findReceipt(reference) || "empty"); }}>
+    <form className="lookup-form" onSubmit={search}>
       <label htmlFor="order-reference">เลขที่ใบสมัคร</label>
-      <p id="reference-hint">ค้นหาใบสมัครที่ทดลองสร้างในแท็บนี้ หรือใช้ <button type="button" className="example-reference" onClick={() => { setReference(example.reference); setResult(null); }}>{example.reference}</button></p>
-      <div className="lookup-input"><Search size={19} aria-hidden="true" /><input id="order-reference" name="reference" value={reference} onChange={(e) => { setReference(e.target.value); setResult(null); }} placeholder="เช่น DEMO-1001" aria-describedby="reference-hint" required maxLength={50} autoComplete="off" spellCheck={false} /><button className="button button-primary" type="submit">ค้นหาใบสมัคร</button></div>
-      <p className="lookup-note">เฉพาะใบสมัครตัวอย่างในแท็บนี้ ไม่มีการดึงข้อมูลผู้สมัครจริงจาก Admin</p>
+      <p id="reference-hint">ใช้เลขใบสมัครและเบอร์โทรผู้ติดต่อ 4 ตัวท้ายเพื่อดูสถานะ</p>
+      <div className="lookup-input"><Search size={19} aria-hidden="true" /><input id="order-reference" value={reference} onChange={(e) => { setReference(e.target.value); setResult(null); }} required maxLength={50} autoComplete="off" aria-describedby="reference-hint" disabled={uploading || pending} /></div>
+      <label htmlFor="order-phone">เบอร์โทรผู้ติดต่อ 4 ตัวท้าย</label>
+      <input id="order-phone" value={phone} onChange={(e) => { setPhone(e.target.value.replace(/\D/g, "").slice(0,4)); setResult(null); }} inputMode="numeric" pattern="[0-9]{4}" maxLength={4} required autoComplete="off" disabled={uploading || pending} />
+      <button className="button button-primary" type="submit" disabled={pending || uploading}>{pending ? "กำลังค้นหา…" : "ค้นหาใบสมัคร"}</button>
     </form>
-    <div aria-live="polite" aria-atomic="true">
-      {result && result !== "empty" && event && <section className="lookup-result"><div className="lookup-result-heading"><span className="lookup-result-icon"><FileSearch size={23} /></span><div><span className="event-category">ใบสมัครตัวอย่าง</span><h2>{result.reference}</h2></div><span className="status-badge status-upcoming">รอชำระเงิน (ตัวอย่าง)</span></div><h3>{displayName(event)}</h3><dl><div><dt>วันจัดงาน</dt><dd>{formatDate(event.date, true)}</dd></div><div><dt>สถานที่</dt><dd>{event.venue}</dd></div><div><dt>ผู้สมัครและระยะวิ่ง</dt><dd>{result.races.map((person, index) => <span key={index} style={{ display: "block" }}>คนที่ {index + 1}: {person.race} · เสื้อ {person.size}</span>)}</dd></div><div><dt>ยอดรวม{result.delivery === "shipping" ? " (รวมค่าจัดส่ง)" : ""}</dt><dd>฿{price(result.amount)}</dd></div></dl><Link className="text-link" href={`/events/${event.slug}`}>ดูรายละเอียดงาน <ArrowUpRight size={16} /></Link></section>}
-      {result === "empty" && <div className="lookup-empty"><FileSearch size={30} aria-hidden="true" /><h2>ไม่พบใบสมัครตัวอย่าง</h2><p>ตรวจสอบเลขที่ใบสมัครและเปิดในแท็บเดียวกับที่ทดลองสมัคร หรือลองใช้ {example.reference}</p></div>}
-    </div>
-    <div className="info-note">ใบสมัครทดลองไม่มีการจองสิทธิ์หรือชำระเงินจริง เก็บเฉพาะเลขใบสมัคร ระยะวิ่ง และยอดรวมในแท็บนี้ โดยไม่เก็บข้อมูลส่วนตัวของผู้สมัคร</div>
+    {error && <p className="reg-field-error" role="alert">{error}</p>}
+    {notice && <p role="status">{notice}</p>}
+    {result && <section className="lookup-result"><div className="lookup-result-heading"><FileSearch size={24} aria-hidden="true" /><h2>{result.orderNo}</h2><span className="status-badge">{labels[result.status]}</span></div>
+      {result.event && <><h3>{displayName(result.event)}</h3><p>{formatDate(result.event.date, true)} · {result.event.venue}</p></>}
+      <dl><div><dt>ผู้สมัครและระยะวิ่ง</dt><dd>{result.races.map((person,index) => <span key={index} style={{display:"block"}}>คนที่ {index+1}: {person.race} · เสื้อ {person.size}</span>)}</dd></div><div><dt>ค่าสมัคร</dt><dd>฿{price(result.amount.subtotal)}</dd></div><div><dt>ค่าจัดส่ง</dt><dd>฿{price(result.amount.shipping)}</dd></div><div><dt>ยอดรวม</dt><dd>฿{price(result.amount.total)}</dd></div>{result.expiresAt && <div><dt>กำหนดชำระ</dt><dd>{new Date(result.expiresAt).toLocaleString("th-TH",{timeZone:"Asia/Bangkok"})}</dd></div>}</dl>
+      {result.rejectionReason && <p role="status">เหตุผลที่สลิปไม่ผ่าน: {result.rejectionReason}</p>}
+      {result.canUploadSlip && <form className="slip-upload-form" onSubmit={upload}><h3>ส่งหลักฐานการชำระเงิน</h3><p>กรุณาตรวจสอบช่องทางรับชำระกับผู้จัด ขณะนี้หน้าเว็บยังไม่แสดง QR หรือบัญชีรับเงิน</p><label>รูปสลิป (JPG, PNG, WEBP ไม่เกิน 5 MB)<input ref={input} type="file" accept="image/jpeg,image/png,image/webp" required disabled={uploading} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label><button className="button button-primary" disabled={!file || uploading} type="submit"><Upload size={16} aria-hidden="true" />{uploading ? "กำลังส่ง…" : "ส่งสลิป"}</button></form>}
+      {result.event && <Link className="text-link" href={`/events/${result.event.slug}`}>ดูรายละเอียดงาน <ArrowUpRight size={16} aria-hidden="true" /></Link>}
+    </section>}
   </div>;
 }

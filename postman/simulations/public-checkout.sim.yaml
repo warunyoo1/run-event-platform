@@ -1,0 +1,5 @@
+simulation: public-checkout
+routing: path
+mocks:
+  - routeKey: running
+    path: ../mocks/public-api/default.js

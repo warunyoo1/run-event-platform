@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type HTMLInputTypeAttribute } from "react";
 import { ArrowLeft, ArrowRight, CalendarDays, Check, CheckCircle2, ChevronRight, ClipboardList, Copy, CreditCard, MapPin, Pencil, Plus, Shirt, Trash2, Truck, UserRound } from "lucide-react";
 import { displayName, formatDate, price, type RunningEvent } from "@/lib/events";
-import { MAX_PARTICIPANTS, SHIPPING_FEE, createDemoReceipt, emptyDelivery, emptyParticipant, provinces, registrationTotal, saveDemoReceipt, shirtSizes, validateDelivery, validateParticipant, type DeliveryDraft, type DemoReceipt, type FieldErrors, type ParticipantDraft } from "@/lib/registration";
+import { MAX_PARTICIPANTS, SHIPPING_FEE, emptyDelivery, emptyParticipant, provinces, registrationTotal, shirtSizes, validateDelivery, validateParticipant, type DeliveryDraft, type DemoReceipt, type FieldErrors, type ParticipantDraft } from "@/lib/registration";
+import { createOrder, PublicApiError } from "@/lib/api";
 import { gsap, motionAllowed, smoothScrollTo, useGSAP } from "@/lib/motion";
 
 type Option = string | { value: string; label: string };
@@ -36,6 +37,8 @@ export function RegistrationForm({ event, currentYear }: { event: RunningEvent; 
   const [acknowledged, setAcknowledged] = useState(false);
   const [receipt, setReceipt] = useState<DemoReceipt | null>(null);
   const [receiptSaved, setReceiptSaved] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [expiresAt, setExpiresAt] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
   const [announcement, setAnnouncement] = useState("");
   const [undo, setUndo] = useState<{ person: ParticipantDraft; index: number } | null>(null);
@@ -138,29 +141,35 @@ export function RegistrationForm({ event, currentYear }: { event: RunningEvent; 
     if (Object.keys(nextErrors).length) { reportErrors(nextErrors); return; }
     goTo(3);
   };
-  const complete = () => {
-    if (completedRef.current) return;
+  const complete = async () => {
+    if (completedRef.current || submitting) return;
     if (event.status !== "open" || !participants.length || participants.length > MAX_PARTICIPANTS || participants.some((person) => Object.keys(validateParticipant(person, event)).length) || Object.keys(validateDelivery(delivery)).length) {
       reportErrors({}, "ข้อมูลยังไม่ครบ กรุณาย้อนกลับไปตรวจสอบผู้สมัครและที่อยู่"); return;
     }
-    if (!acknowledged) { reportErrors({}, "กรุณายืนยันว่าคุณเข้าใจว่านี่เป็นการสมัครทดลอง"); return; }
-    completedRef.current = true;
-    const created = createDemoReceipt(event, participants, delivery);
-    setReceiptSaved(saveDemoReceipt(created)); setReceipt(created); goTo(4);
-    // No personal form values are retained in the completion view.
-    setParticipants([]); setDraft(emptyParticipant()); setDelivery(emptyDelivery());
+    if (!acknowledged) { reportErrors({}, "กรุณายืนยันว่าตรวจสอบข้อมูลถูกต้องแล้ว"); return; }
+    completedRef.current = true; setSubmitting(true);
+    try {
+      const created = await createOrder(event.slug, participants, delivery);
+      setReceipt({ reference: created.orderNo, eventSlug: event.slug, races: participants.map(({ race, size }) => ({ race, size })), amount: created.amount.total, delivery: delivery.method, createdAt: new Date().toISOString(), status: created.status });
+      setExpiresAt(created.expiresAt); setReceiptSaved(true); goTo(4);
+      setParticipants([]); setDraft(emptyParticipant()); setDelivery(emptyDelivery()); setUndo(null);
+    } catch (error) {
+      completedRef.current = false;
+      const message = error instanceof Error ? error.message : "สมัครไม่สำเร็จ กรุณาลองใหม่";
+      const fields = error instanceof PublicApiError ? Object.values(error.fields).join(" · ") : "";
+      reportErrors({}, [message, fields].filter(Boolean).join(" · "));
+    } finally { setSubmitting(false); }
   };
-
   const errorSummary = (prefix = "") => (Object.keys(errors).length > 0 || generalError) && <div className="reg-errors" role="alert" ref={errorRef} tabIndex={-1}><strong>{generalError || "กรุณาตรวจสอบข้อมูลต่อไปนี้"}</strong>{Object.keys(errors).length > 0 && <ul>{Object.entries(errors).map(([key, value]) => <li key={key}><a href={`#${prefix}${key === "birthDate" ? "birthDay" : key}`} onClick={(e) => { e.preventDefault(); document.getElementById(`${prefix}${key === "birthDate" ? "birthDay" : key}`)?.focus(); }}>{value}</a></li>)}</ul>}</div>;
   const participantList = (editable = true) => <div className="reg-person-list">{participants.map((person, index) => <article className="reg-person" key={index}><span className="reg-person-number">{index + 1}</span><div className="reg-person-info"><h3>{person.firstName} {person.lastName}</h3><p>{person.race} <span>เสื้อ {person.size}</span>{person.team && <span>{person.team}</span>}</p></div><strong>฿{price(event.races.find((race) => race.name === person.race)?.price || 0)}</strong>{editable && <div className="reg-person-actions"><button type="button" aria-label={`แก้ไขผู้สมัครคนที่ ${index + 1}`} onClick={() => { setDraft({ ...person }); setEditing(index); setFormOpen(true); setErrors({}); setGeneralError(""); requestAnimationFrame(() => document.getElementById("firstName")?.focus()); }}><Pencil size={17} /></button><button type="button" aria-label={`ลบผู้สมัครคนที่ ${index + 1}`} onClick={() => removeParticipant(index)}><Trash2 size={17} /></button></div>}</article>)}</div>;
   const totalSummary = () => <dl className="reg-totals"><div><dt>ค่าสมัคร {participants.length} คน</dt><dd>฿{price(totals.subtotal)}</dd></div><div><dt>ค่าจัดส่ง{delivery.method === "pickup" ? " (รับด้วยตนเอง)" : " (ต่อใบสมัคร)"}</dt><dd>{totals.shipping ? `฿${price(totals.shipping)}` : "ไม่มีค่าใช้จ่าย"}</dd></div><div className="reg-grand-total"><dt>ยอดรวม</dt><dd>฿{price(totals.total)}</dd></div></dl>;
 
   return <div className="container registration-page">
     <Link className="back-link" href={`/events/${event.slug}`}><ArrowLeft size={17} />กลับไปดูรายละเอียดงาน</Link>
-    <div className="reg-event-heading"><div><span className="reg-kicker">สมัครเข้าร่วมกิจกรรม</span><h1>{displayName(event)}</h1><p><CalendarDays size={16} />{formatDate(event.date, true)}<span /><MapPin size={16} />{event.province}</p></div><span className="reg-demo-tag">ทดลองสมัคร</span></div>
-    <div className="reg-demo-notice"><ClipboardList size={19} /><p>แบบฟอร์มตัวอย่าง ยังไม่ส่งข้อมูลเข้า Admin หรือรับชำระเงินจริง ข้อมูลส่วนตัวอยู่เฉพาะหน้านี้และจะหายเมื่อรีโหลด กรุณาใช้ข้อมูลสมมติในการทดลอง</p></div>
+    <div className="reg-event-heading"><div><span className="reg-kicker">สมัครเข้าร่วมกิจกรรม</span><h1>{displayName(event)}</h1><p><CalendarDays size={16} />{formatDate(event.date, true)}<span /><MapPin size={16} />{event.province}</p></div></div>
+    <div className="reg-demo-notice"><ClipboardList size={19} /><p>ยืนยันแล้วจะสร้างใบสมัครในระบบ โปรดตรวจสอบข้อมูลก่อนส่ง ข้อมูลที่ยังไม่ส่งจะหายเมื่อรีโหลด</p></div>
     <div className="reg-card" ref={motionScope}><div className="reg-progress"><p className="reg-progress-title">ขั้นตอนการสมัคร</p><ol aria-label="ขั้นตอนการสมัคร">{steps.map((label, index) => <li key={label} className={step > index + 1 ? "is-complete" : step === index + 1 ? "is-current" : ""} aria-current={step === index + 1 ? "step" : undefined}><span className="reg-step-number">{step > index + 1 ? <Check size={18} /> : index + 1}</span><span>{label}{step > index + 1 && <span className="sr-only"> (เสร็จแล้ว)</span>}</span></li>)}</ol></div>
-    <div className="reg-content"><p className="sr-only" role="status" aria-live="polite">{announcement}</p><div className="reg-section-heading"><div><span>ขั้นตอนที่ {step} จาก 4</span><h2 ref={headingRef} tabIndex={-1}>{step === 1 ? "กรอกข้อมูลผู้เข้าร่วมกิจกรรม" : step === 2 ? "ข้อมูลติดต่อและการรับอุปกรณ์" : step === 3 ? "ตรวจสอบใบสมัครและการชำระเงิน" : "สร้างใบสมัครตัวอย่างแล้ว"}</h2></div>{(step === 2 || (step === 1 && formOpen)) && <p><span className="reg-required">*</span> จำเป็นต้องกรอก</p>}</div>
+    <div className="reg-content"><p className="sr-only" role="status" aria-live="polite">{announcement}</p><div className="reg-section-heading"><div><span>ขั้นตอนที่ {step} จาก 4</span><h2 ref={headingRef} tabIndex={-1}>{step === 1 ? "กรอกข้อมูลผู้เข้าร่วมกิจกรรม" : step === 2 ? "ข้อมูลติดต่อและการรับอุปกรณ์" : step === 3 ? "ตรวจสอบใบสมัครและการชำระเงิน" : "สร้างใบสมัครแล้ว"}</h2></div>{(step === 2 || (step === 1 && formOpen)) && <p><span className="reg-required">*</span> จำเป็นต้องกรอก</p>}</div>
 
     {step === 1 && <>
       {undo && <div className="reg-toast"><span>ลบผู้สมัครคนที่ {undo.index + 1} แล้ว</span><button type="button" className="reg-toast-action" onClick={undoRemove}>เลิกทำ</button></div>}
@@ -224,12 +233,12 @@ export function RegistrationForm({ event, currentYear }: { event: RunningEvent; 
 
     {step === 3 && <>
       {errorSummary()}
-      <div className="reg-review-grid"><div><div className="reg-list-heading"><h3>รายชื่อผู้สมัคร <span>{participants.length} คน</span></h3><button className="text-link" type="button" onClick={() => goTo(1)}><Pencil size={15} />แก้ไข</button></div>{participantList(false)}<section className="reg-contact-review"><div className="reg-list-heading"><h3>ข้อมูลติดต่อและรับอุปกรณ์</h3><button className="text-link" type="button" onClick={() => goTo(2)}><Pencil size={15} />แก้ไข</button></div><p>{delivery.contact} · {delivery.phone}</p><p>{delivery.method === "shipping" ? `${delivery.street} ${delivery.subdistrict} ${delivery.district} ${delivery.province} ${delivery.postalCode}` : "รับอุปกรณ์ด้วยตนเองตามประกาศของผู้จัด"}</p></section></div>
-      <aside className="reg-payment"><h3>สรุปยอดค่าสมัคร</h3>{totalSummary()}<div className="reg-payment-demo"><CreditCard size={25} /><strong>การชำระเงินแบบทดลอง</strong><p>ขั้นตอนนี้แสดงยอดสำหรับตรวจสอบเท่านั้น ไม่มี QR รับเงินหรือการตัดเงินจริง ใบสมัครตัวอย่างจะอยู่ในสถานะรอชำระเงิน</p></div><label className="reg-checkbox"><input type="checkbox" checked={acknowledged} onChange={(e) => { setAcknowledged(e.target.checked); setGeneralError(""); }} /><span>ฉันตรวจสอบข้อมูลแล้ว และเข้าใจว่านี่เป็นการสมัครทดลอง ไม่มีการชำระเงินจริง</span></label><button className="button button-primary" type="button" onClick={complete}>ยืนยันใบสมัครตัวอย่าง <ChevronRight size={18} /></button></aside></div>
-      <div className="reg-step-footer"><button className="button button-outline" type="button" onClick={() => goTo(2)}><ArrowLeft size={17} />ย้อนกลับ</button><span>ยังไม่ส่งใบสมัครเข้าระบบ Admin</span></div>
+      <div className="reg-review-grid"><div><div className="reg-list-heading"><h3>รายชื่อผู้สมัคร <span>{participants.length} คน</span></h3><button className="text-link" type="button" disabled={submitting} onClick={() => goTo(1)}><Pencil size={15} />แก้ไข</button></div>{participantList(false)}<section className="reg-contact-review"><div className="reg-list-heading"><h3>ข้อมูลติดต่อและรับอุปกรณ์</h3><button className="text-link" type="button" disabled={submitting} onClick={() => goTo(2)}><Pencil size={15} />แก้ไข</button></div><p>{delivery.contact} · {delivery.phone}</p><p>{delivery.method === "shipping" ? `${delivery.street} ${delivery.subdistrict} ${delivery.district} ${delivery.province} ${delivery.postalCode}` : "รับอุปกรณ์ด้วยตนเองตามประกาศของผู้จัด"}</p></section></div>
+      <aside className="reg-payment"><h3>สรุปยอดค่าสมัคร</h3>{totalSummary()}<div className="reg-payment-demo"><CreditCard size={25} /><strong>ตรวจสอบยอดก่อนสมัคร</strong><p>ยอดนี้เป็นประมาณการ ยอดสุดท้ายจะยึดตามระบบหลังยืนยัน ขณะนี้ยังไม่แสดง QR หรือบัญชีรับเงิน กรุณาติดตามคำแนะนำจากผู้จัด</p></div><label className="reg-checkbox"><input type="checkbox" checked={acknowledged} onChange={(e) => { setAcknowledged(e.target.checked); setGeneralError(""); }} /><span>ฉันตรวจสอบข้อมูลผู้สมัครและข้อมูลติดต่อถูกต้องแล้ว</span></label><button className="button button-primary" type="button" disabled={submitting} onClick={complete}>{submitting ? "กำลังสร้างใบสมัคร…" : "ยืนยันใบสมัคร"} <ChevronRight size={18} /></button></aside></div>
+      <div className="reg-step-footer"><button className="button button-outline" type="button" disabled={submitting} onClick={() => goTo(2)}><ArrowLeft size={17} />ย้อนกลับ</button><span>ยังไม่ส่งใบสมัครเข้าระบบ Admin</span></div>
     </>}
 
-    {step === 4 && receipt && <section className="reg-complete"><span className="reg-success-icon"><CheckCircle2 size={48} /></span><h3>พร้อมแล้วสำหรับก้าวต่อไป</h3><p>สร้างใบสมัครตัวอย่างสำหรับ {displayName(event)} แล้ว<br />ยังไม่มีการจองสิทธิ์หรือชำระเงินจริง</p><div className="reg-receipt"><span>เลขที่ใบสมัครตัวอย่าง</span><strong>{receipt.reference}</strong><button type="button" className="text-link" onClick={async () => { try { await navigator.clipboard.writeText(receipt.reference); setCopyMessage("คัดลอกเลขที่ใบสมัครแล้ว"); } catch { setCopyMessage("คัดลอกไม่ได้ กรุณาเลือกและคัดลอกเลขด้านบน"); } }}><Copy size={16} />คัดลอกเลขใบสมัคร</button><p role="status">{copyMessage}</p><dl><div><dt>จำนวนผู้สมัคร</dt><dd>{receipt.races.length} คน</dd></div><div><dt>ยอดรวมตัวอย่าง</dt><dd>฿{price(receipt.amount)}</dd></div><div><dt>สถานะ</dt><dd>รอชำระเงิน (ตัวอย่าง)</dd></div></dl></div><div className="reg-complete-actions">{receiptSaved && <Link className="button button-primary" href={`/find-order?reference=${encodeURIComponent(receipt.reference)}`}>ดูใบสมัครตัวอย่าง <ChevronRight size={17} /></Link>}<Link className="button button-outline" href={`/events/${event.slug}`}>กลับไปหน้ากิจกรรม</Link></div><p className="reg-complete-note">{receiptSaved ? "เก็บเฉพาะเลขใบสมัคร ระยะวิ่ง และยอดรวมไว้ในแท็บนี้สำหรับทดลองค้นหา ไม่มีการเก็บข้อมูลส่วนตัวที่กรอก" : "เบราว์เซอร์ไม่อนุญาตให้เก็บใบสมัครตัวอย่าง กรุณาจดเลขด้านบนไว้ รายการนี้จะไม่ปรากฏในหน้าค้นหา"}</p></section>}
+    {step === 4 && receipt && <section className="reg-complete"><span className="reg-success-icon"><CheckCircle2 size={48} /></span><h3>พร้อมแล้วสำหรับก้าวต่อไป</h3><p>สร้างใบสมัครสำหรับ {displayName(event)} แล้ว<br />โปรดเก็บเลขใบสมัครไว้เพื่อติดตามสถานะและส่งสลิป</p><div className="reg-receipt"><span>เลขที่ใบสมัคร</span><strong>{receipt.reference}</strong><button type="button" className="text-link" onClick={async () => { try { await navigator.clipboard.writeText(receipt.reference); setCopyMessage("คัดลอกเลขที่ใบสมัครแล้ว"); } catch { setCopyMessage("คัดลอกไม่ได้ กรุณาเลือกและคัดลอกเลขด้านบน"); } }}><Copy size={16} />คัดลอกเลขใบสมัคร</button><p role="status">{copyMessage}</p><dl><div><dt>จำนวนผู้สมัคร</dt><dd>{receipt.races.length} คน</dd></div><div><dt>ยอดรวม</dt><dd>฿{price(receipt.amount)}</dd></div><div><dt>สถานะ</dt><dd>รอชำระเงิน</dd></div></dl></div><div className="reg-complete-actions">{receiptSaved && <Link className="button button-primary" href={`/find-order?reference=${encodeURIComponent(receipt.reference)}`}>ดูใบสมัครและส่งสลิป <ChevronRight size={17} /></Link>}<Link className="button button-outline" href={`/events/${event.slug}`}>กลับไปหน้ากิจกรรม</Link></div><p className="reg-complete-note">{expiresAt && `กำหนดชำระ: ${new Date(expiresAt).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })} · `}ค้นหาด้วยเลขใบสมัครและเบอร์โทรผู้ติดต่อ 4 ตัวท้าย</p></section>}
 
     </div></div>
   </div>;

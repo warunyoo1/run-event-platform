@@ -559,3 +559,7 @@ html { scroll-padding-top: 108px; }
 }
 ::selection { color: var(--text-on-color); background: var(--blue); }
 input, select { caret-color: var(--blue); }
+
+.lookup-form > input { display: block; min-height: 48px; width: min(100%,240px); padding: 10px 14px; border: 1px solid #d8dee5; border-radius: 8px; margin: 8px 0 16px; font: inherit; }
+.slip-upload-form { padding-top: 20px; margin-top: 20px; border-top: 1px solid #e8ebef; }
+.slip-upload-form label { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
