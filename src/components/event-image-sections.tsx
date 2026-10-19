@@ -28,14 +28,14 @@ function ImageFigure({ image, title, index }: { image: EventImage; title: string
   </figure>;
 }
 
-export function EventImageSections({ event }: { event: RunningEvent }) {
+export function EventImageSections({ event, includeCover = false }: { event: RunningEvent; includeCover?: boolean }) {
   const images = [...(event.images ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
   // The first cover is already shown above the detail tabs. All other images
   // remain available here, including unknown kinds from future API versions.
   const primaryCover = images.find((image) => image.kind === "cover");
   const knownKinds = new Set(sections.map((section) => section.kind));
   return <div className="event-media-sections">{sections.map(({ kind, title }) => {
-    const group = images.filter((image) => image !== primaryCover && (image.kind === kind || (kind === "other" && !knownKinds.has(image.kind))));
+    const group = images.filter((image) => (includeCover || image !== primaryCover) && (image.kind === kind || (kind === "other" && !knownKinds.has(image.kind))));
     if (!group.length) return null;
     return <section className={`event-media-section event-media-${kind}`} key={kind} aria-label={title}>
       <h2>{title}<span>{group.length} ภาพ</span></h2>

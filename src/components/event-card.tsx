@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { ArrowUpRight, MapPin } from "lucide-react";
-import { displayName, categoryLabels, formatDate, price, statusLabels, type RunningEvent } from "@/lib/events";
+import { ArrowUpRight, Flag, MapPin } from "lucide-react";
+import { displayName, themeLabels, categoryLabels, formatDate, price, statusLabels, type RunningEvent } from "@/lib/events";
 import { EventPoster } from "./event-poster";
 
 export function EventCard({ event }: { event: RunningEvent }) {
@@ -17,9 +17,10 @@ export function EventCard({ event }: { event: RunningEvent }) {
       <h3>{displayName(event)}</h3>
       <div className="card-facts">
         <div className="card-date-stamp" aria-hidden="true"><strong>{day}</strong><span>{month}</span></div>
-        <div className="card-location"><time dateTime={event.date}>{formatDate(event.date)}</time><p className="event-meta event-venue"><MapPin size={15} /><span>{event.venue} · {event.province}</span></p></div>
+        <div className="card-location"><time dateTime={event.date}>{formatDate(event.date)}</time><p className="event-meta event-venue"><MapPin size={15} /><span>ชื่อสถานที่: {event.venue}{event.province && ` · ${event.province}`}</span></p>{event.startPoint?.trim() && <p className="event-meta card-start-point"><Flag size={15} aria-hidden="true" /><span>จุดปล่อยตัว: {event.startPoint}</span></p>}</div>
       </div>
       <div className="card-races"><span className="event-category">{categoryLabels[event.category]}</span><div className="distance-tags">{event.races.map((race) => <span key={race.name}>{race.name}</span>)}</div></div>
+      {themeLabels[event.theme] && <p className="card-theme">ธีมสี: {themeLabels[event.theme]}</p>}
       <div className="card-availability"><span className={`status-badge status-${event.status}`}><span />{statusLabels[event.status]}</span></div>
       <div className="card-bottom"><span className="card-price">ค่าสมัครเริ่มต้น<strong>฿{price(Math.min(...event.races.map((r) => r.price)))}</strong></span><span className="card-detail" aria-hidden="true">ดูรายละเอียด <ArrowUpRight size={18} /></span></div>
     </div>

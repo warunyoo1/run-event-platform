@@ -2,11 +2,10 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { ArrowUpRight, FileSearch, Search, Upload } from "lucide-react";
-import { displayName, formatDate, price } from "@/lib/events";
+import { FileSearch, Search, Upload } from "lucide-react";
+import { OrderResult } from "./order-result";
 import { findOrder, sendSlip, type PublicOrder } from "@/lib/api";
 
-const labels = { pending: "รอชำระเงิน", slip_uploaded: "รอตรวจสลิป", paid: "ชำระเงินแล้ว", rejected: "สลิปไม่ผ่าน", expired: "หมดเวลาชำระเงิน", cancelled: "ยกเลิกแล้ว" };
 export function OrderLookup({ initialReference = "" }: { initialReference?: string }) {
   const [reference, setReference] = useState(initialReference);
   const [phone, setPhone] = useState("");
@@ -59,12 +58,7 @@ export function OrderLookup({ initialReference = "" }: { initialReference?: stri
     <details className="lookup-help"><summary>จำเลขใบสมัครไม่ได้?</summary><p>ตรวจสอบภาพหน้าจอหรือเลขที่คัดลอกไว้จากหน้าสมัครสำเร็จ หากหาไม่พบ ให้ติดต่อผู้จัดผ่านช่องทางในประกาศงานเพื่อช่วยตรวจสอบ กรุณาอย่าสมัครซ้ำระหว่างรอตรวจสอบ</p><Link className="text-link" href="/events">ค้นหางานที่สมัคร</Link></details>
     {error && <p className="reg-field-error" role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
-    {result && <section className="lookup-result"><div className="lookup-result-heading"><FileSearch size={24} aria-hidden="true" /><h2>{result.orderNo}</h2><span className="status-badge">{labels[result.status]}</span></div>
-      {result.event && <><h3>{displayName(result.event)}</h3><p>{formatDate(result.event.date, true)} · {result.event.venue}</p></>}
-      <dl><div><dt>ผู้สมัครและระยะวิ่ง</dt><dd>{result.races.map((person,index) => <span key={index} style={{display:"block"}}>คนที่ {index+1}: {person.race} · เสื้อ {person.size}</span>)}</dd></div><div><dt>ค่าสมัคร</dt><dd>฿{price(result.amount.subtotal)}</dd></div><div><dt>ค่าจัดส่ง</dt><dd>฿{price(result.amount.shipping)}</dd></div><div><dt>ยอดรวม</dt><dd>฿{price(result.amount.total)}</dd></div>{result.expiresAt && <div><dt>กำหนดชำระ</dt><dd>{new Date(result.expiresAt).toLocaleString("th-TH",{timeZone:"Asia/Bangkok"})}</dd></div>}</dl>
-      {result.rejectionReason && <p role="status">เหตุผลที่สลิปไม่ผ่าน: {result.rejectionReason}</p>}
-      {result.canUploadSlip && <form className="slip-upload-form" onSubmit={upload}><h3>ส่งหลักฐานการชำระเงิน</h3><p>กรุณาตรวจสอบช่องทางรับชำระกับผู้จัด ขณะนี้หน้าเว็บยังไม่แสดง QR หรือบัญชีรับเงิน</p><label>รูปสลิป (JPG, PNG, WEBP ไม่เกิน 5 MB)<input ref={input} type="file" accept="image/jpeg,image/png,image/webp" required disabled={uploading} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label><button className="button button-primary" disabled={!file || uploading} type="submit"><Upload size={16} aria-hidden="true" />{uploading ? "กำลังส่ง…" : "ส่งสลิป"}</button></form>}
-      {result.event && <Link className="text-link" href={`/events/${result.event.slug}`}>ดูรายละเอียดงาน <ArrowUpRight size={16} aria-hidden="true" /></Link>}
-    </section>}
-  </div>;
+    {result && <OrderResult result={result}>
+      {result.canUploadSlip && <form className="slip-upload-form" onSubmit={upload}><h3>ส่งหลักฐานการชำระเงิน</h3><p>กรุณาตรวจสอบช่องทางรับชำระกับผู้จัด ขณะนี้หน้าเว็บยังไม่แสดง QR หรือบัญชีรับเงิน</p><label className="slip-file-field"><span><Upload size={24} aria-hidden="true" /><strong>{file ? file.name : "เลือกภาพสลิป"}</strong><small>JPG, PNG หรือ WEBP · ไม่เกิน 5 MB</small></span><input ref={input} type="file" aria-label="เลือกภาพสลิป" accept="image/jpeg,image/png,image/webp" required disabled={uploading} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label><button className="button button-primary" disabled={!file || uploading} type="submit"><Upload size={16} aria-hidden="true" />{uploading ? "กำลังส่ง…" : "ส่งสลิป"}</button></form>}
+      </OrderResult>}</div>;
 }

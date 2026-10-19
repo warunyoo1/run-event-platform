@@ -260,3 +260,7 @@ Race options separate distance and per-person price in a shared header, followed
 ### Typed event media
 Event detail overview renders sorted image groups for poster, route_map, shirt, medal, gallery, sponsor, extra covers and other/unknown kinds. The primary cover remains above tabs and is not repeated. Empty groups are omitted. Documentary images use contain and full-size links; gallery thumbnails use 4:3 crops. Images lazy-load, have alt descriptions, a load-error fallback and labelled new-tab full-size links. Desktop uses two columns except posters/maps; mobile stacks. Live QA event verified with two secondary gallery images; all kinds covered by rendering regression tests.
 
+
+### Order lookup result
+OrderResult separates the reference/status header, event context, participant list and cost summary. Cost totals use tabular numerals and a 28px total. Two desktop columns stack on mobile. Slip selection retains the native file input with a labelled visual selector, selected filename, visible focus and existing file validation. Disabled submit and upload callbacks remain unchanged. UI checked with synthetic pending-order data without submitting to the API.
+

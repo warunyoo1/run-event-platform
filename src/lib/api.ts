@@ -20,7 +20,7 @@ export async function publicRequest<T>(path: string, options: RequestInit = {}):
   if (!body || !("data" in body)) throw new PublicApiError(0, "BAD_RESPONSE", "ระบบตอบกลับไม่สมบูรณ์ กรุณาลองใหม่");
   return body.data as T;
 }
-type ApiEvent = Omit<RunningEvent, "races"> & { races: { id: string; name: string; price: number; quota: number; remaining: number; start: string | null }[] };
+type ApiEvent = Omit<RunningEvent, "races"> & { races: { id: string; name: string; price: number; quota: number; unlimitedQuota?: boolean; reserved?: number; remaining: number; start: string | null }[] };
 export const normalizeEvent = (event: ApiEvent): RunningEvent => ({ ...event, province: event.province ?? "", subtitle: event.subtitle ?? "", description: event.description ?? "", registrationEnds: event.registrationEnds ?? "", organizer: event.organizer ?? "", races: event.races.map((race) => ({ ...race, start: race.start ?? "" })) });
 export async function listEvents(signal?: AbortSignal) { return (await publicRequest<ApiEvent[]>("/events", { signal })).map(normalizeEvent); }
 export async function findEvent(slug: string) {

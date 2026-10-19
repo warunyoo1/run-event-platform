@@ -4,7 +4,7 @@ import { RegistrationLeaveGuard } from "./registration-leave-guard";
 import Link from "next/link";
 import { useEffect, useRef, useState, type HTMLInputTypeAttribute } from "react";
 import { ArrowLeft, ArrowRight, CalendarDays, Check, CheckCircle2, ChevronRight, ClipboardList, Copy, CreditCard, MapPin, Pencil, Plus, Shirt, Trash2, Truck, UserRound } from "lucide-react";
-import { displayName, formatDate, price, type RunningEvent } from "@/lib/events";
+import { raceAvailability, displayName, formatDate, price, type RunningEvent } from "@/lib/events";
 import { MAX_PARTICIPANTS, SHIPPING_FEE, emptyDelivery, emptyParticipant, provinces, registrationTotal, shirtSizes, validateDelivery, validateParticipant, type DeliveryDraft, type DemoReceipt, type FieldErrors, type ParticipantDraft } from "@/lib/registration";
 import { createOrder, PublicApiError } from "@/lib/api";
 import { gsap, motionAllowed, smoothScrollTo, useGSAP } from "@/lib/motion";
@@ -181,7 +181,7 @@ export function RegistrationForm({ event, currentYear }: { event: RunningEvent; 
         </fieldset>
         <fieldset className="reg-group"><legend>การแข่งขัน</legend>
           <div className="reg-fields">
-          {select("race", "ประเภทการแข่งขัน", event.races.map((race) => ({ value: race.name, label: `${race.name} — ฿${price(race.price)}` })), true)}
+          {select("race", "ประเภทการแข่งขัน", event.races.map((race) => ({ value: race.name, label: `${race.name} — ฿${price(race.price)} · ${raceAvailability(race)}` })), true)}
           {select("size", "ขนาดเสื้อ", shirtSizes, true)}
           {select("applicantType", "สถานะผู้สมัคร", ["บุคคลทั่วไป", "นักเรียน / นักศึกษา", "ผู้สูงอายุ"], true)}
           {input("team", "ชื่อทีม / ชมรม (ถ้ามี)")}
