@@ -1,0 +1,31 @@
+# platform (Next.js standalone) สำหรับ build/รันบนเครื่อง dev
+# API_PROXY_TARGET เป็น build arg: ถูกฝังตอน build ไม่ใช่ตอนรัน ถ้าเปลี่ยนต้อง build ใหม่
+#   ค่าเริ่มต้นชี้ไป API ที่รันบนเครื่อง host (port 4000) ผ่าน host.docker.internal
+#   ถ้ารัน API ด้วย docker compose คนละไฟล์ ให้ตั้ง API_PROXY_TARGET เป็น URL ที่ container เข้าถึงได้
+# ไม่ต้องมีไฟล์ .env: ไม่มี secret ที่ runtime
+services:
+  platform:
+    build:
+      context: .
+      args:
+        API_PROXY_TARGET: ${API_PROXY_TARGET:-http://host.docker.internal:4000}
+    image: run-event-platform:latest
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+    # Linux: host.docker.internal ใช้ได้เมื่อมี extra_hosts นี้ (Docker Desktop มีให้อยู่แล้ว)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    expose:
+      - "3000"
+    # เปิดให้เครื่อง host เข้าถึงเฉพาะ loopback
+    # ใช้ 3100 เพื่อไม่ชนกับ admin (3000) และ npm run dev ของแอปนี้ (3001)
+    ports:
+      - "127.0.0.1:${PLATFORM_HOST_PORT:-3100}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
