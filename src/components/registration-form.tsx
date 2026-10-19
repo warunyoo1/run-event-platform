@@ -1,5 +1,6 @@
 "use client";
 
+import { RegistrationLeaveGuard } from "./registration-leave-guard";
 import Link from "next/link";
 import { useEffect, useRef, useState, type HTMLInputTypeAttribute } from "react";
 import { ArrowLeft, ArrowRight, CalendarDays, Check, CheckCircle2, ChevronRight, ClipboardList, Copy, CreditCard, MapPin, Pencil, Plus, Shirt, Trash2, Truck, UserRound } from "lucide-react";
@@ -49,21 +50,7 @@ export function RegistrationForm({ event, currentYear }: { event: RunningEvent; 
   const motionScope = useRef<HTMLDivElement>(null);
   const totals = registrationTotal(event, participants, delivery.method);
   const hasDraft = JSON.stringify(draft) !== JSON.stringify(emptyParticipant());
-  const unsaved = step < 4 && (participants.length > 0 || hasDraft);
-
-  // Browsers show their own (localised) confirmation; the text itself cannot be customised.
-  useEffect(() => {
-    if (!unsaved) return;
-    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, [unsaved]);
-
-  useEffect(() => {
-    if (!undo) return;
-    const timer = window.setTimeout(() => setUndo(null), 10000);
-    return () => window.clearTimeout(timer);
-  }, [undo]);
+  const unsaved = step < 4 && (participants.length > 0 || hasDraft || Boolean(undo));
 
   useGSAP(() => {
     const media = gsap.matchMedia();
@@ -165,14 +152,15 @@ export function RegistrationForm({ event, currentYear }: { event: RunningEvent; 
   const totalSummary = () => <dl className="reg-totals"><div><dt>ค่าสมัคร {participants.length} คน</dt><dd>฿{price(totals.subtotal)}</dd></div><div><dt>ค่าจัดส่ง{delivery.method === "pickup" ? " (รับด้วยตนเอง)" : " (ต่อใบสมัคร)"}</dt><dd>{totals.shipping ? `฿${price(totals.shipping)}` : "ไม่มีค่าใช้จ่าย"}</dd></div><div className="reg-grand-total"><dt>ยอดรวม</dt><dd>฿{price(totals.total)}</dd></div></dl>;
 
   return <div className="container registration-page">
+    <RegistrationLeaveGuard dirty={unsaved} submitting={submitting} />
     <Link className="back-link" href={`/events/${event.slug}`}><ArrowLeft size={17} />กลับไปดูรายละเอียดงาน</Link>
-    <div className="reg-event-heading"><div><span className="reg-kicker">สมัครเข้าร่วมกิจกรรม</span><h1>{displayName(event)}</h1><p><CalendarDays size={16} />{formatDate(event.date, true)}<span /><MapPin size={16} />{event.province}</p></div></div>
+    <div className="reg-event-heading"><div><h1>{displayName(event)}</h1><p><CalendarDays size={16} />{formatDate(event.date, true)}<span /><MapPin size={16} />{event.province}</p></div></div>
     <div className="reg-demo-notice"><ClipboardList size={19} /><p>ยืนยันแล้วจะสร้างใบสมัครในระบบ โปรดตรวจสอบข้อมูลก่อนส่ง ข้อมูลที่ยังไม่ส่งจะหายเมื่อรีโหลด</p></div>
     <div className="reg-card" ref={motionScope}><div className="reg-progress"><p className="reg-progress-title">ขั้นตอนการสมัคร</p><ol aria-label="ขั้นตอนการสมัคร">{steps.map((label, index) => <li key={label} className={step > index + 1 ? "is-complete" : step === index + 1 ? "is-current" : ""} aria-current={step === index + 1 ? "step" : undefined}><span className="reg-step-number">{step > index + 1 ? <Check size={18} /> : index + 1}</span><span>{label}{step > index + 1 && <span className="sr-only"> (เสร็จแล้ว)</span>}</span></li>)}</ol></div>
     <div className="reg-content"><p className="sr-only" role="status" aria-live="polite">{announcement}</p><div className="reg-section-heading"><div><span>ขั้นตอนที่ {step} จาก 4</span><h2 ref={headingRef} tabIndex={-1}>{step === 1 ? "กรอกข้อมูลผู้เข้าร่วมกิจกรรม" : step === 2 ? "ข้อมูลติดต่อและการรับอุปกรณ์" : step === 3 ? "ตรวจสอบใบสมัครและการชำระเงิน" : "สร้างใบสมัครแล้ว"}</h2></div>{(step === 2 || (step === 1 && formOpen)) && <p><span className="reg-required">*</span> จำเป็นต้องกรอก</p>}</div>
 
     {step === 1 && <>
-      {undo && <div className="reg-toast"><span>ลบผู้สมัครคนที่ {undo.index + 1} แล้ว</span><button type="button" className="reg-toast-action" onClick={undoRemove}>เลิกทำ</button></div>}
+      {undo && <div className="reg-toast"><span>ลบผู้สมัครคนที่ {undo.index + 1} แล้ว · ย้อนคืนได้ก่อนบันทึกหรือลบผู้สมัครรายการถัดไป</span><button type="button" className="reg-toast-action" onClick={undoRemove}>เลิกทำ</button></div>}
       {!formOpen && <><div className="reg-list-heading"><h3 ref={listHeadingRef} tabIndex={-1}>ผู้สมัครทั้งหมด <span>{participants.length} / {MAX_PARTICIPANTS} คน</span></h3><button className="button button-outline" type="button" disabled={participants.length >= MAX_PARTICIPANTS} onClick={() => { setDraft(emptyParticipant()); setEditing(null); setFormOpen(true); setErrors({}); setGeneralError(""); requestAnimationFrame(() => document.getElementById("firstName")?.focus()); }}><Plus size={17} />เพิ่มผู้สมัคร</button></div>{participantList()}</>}
       {formOpen && <form className="reg-participant-form" noValidate onSubmit={(e) => { e.preventDefault(); commitDraft(); }}>
         {errorSummary()}
@@ -235,7 +223,7 @@ export function RegistrationForm({ event, currentYear }: { event: RunningEvent; 
       {errorSummary()}
       <div className="reg-review-grid"><div><div className="reg-list-heading"><h3>รายชื่อผู้สมัคร <span>{participants.length} คน</span></h3><button className="text-link" type="button" disabled={submitting} onClick={() => goTo(1)}><Pencil size={15} />แก้ไข</button></div>{participantList(false)}<section className="reg-contact-review"><div className="reg-list-heading"><h3>ข้อมูลติดต่อและรับอุปกรณ์</h3><button className="text-link" type="button" disabled={submitting} onClick={() => goTo(2)}><Pencil size={15} />แก้ไข</button></div><p>{delivery.contact} · {delivery.phone}</p><p>{delivery.method === "shipping" ? `${delivery.street} ${delivery.subdistrict} ${delivery.district} ${delivery.province} ${delivery.postalCode}` : "รับอุปกรณ์ด้วยตนเองตามประกาศของผู้จัด"}</p></section></div>
       <aside className="reg-payment"><h3>สรุปยอดค่าสมัคร</h3>{totalSummary()}<div className="reg-payment-demo"><CreditCard size={25} /><strong>ตรวจสอบยอดก่อนสมัคร</strong><p>ยอดนี้เป็นประมาณการ ยอดสุดท้ายจะยึดตามระบบหลังยืนยัน ขณะนี้ยังไม่แสดง QR หรือบัญชีรับเงิน กรุณาติดตามคำแนะนำจากผู้จัด</p></div><label className="reg-checkbox"><input type="checkbox" checked={acknowledged} onChange={(e) => { setAcknowledged(e.target.checked); setGeneralError(""); }} /><span>ฉันตรวจสอบข้อมูลผู้สมัครและข้อมูลติดต่อถูกต้องแล้ว</span></label><button className="button button-primary" type="button" disabled={submitting} onClick={complete}>{submitting ? "กำลังสร้างใบสมัคร…" : "ยืนยันใบสมัคร"} <ChevronRight size={18} /></button></aside></div>
-      <div className="reg-step-footer"><button className="button button-outline" type="button" disabled={submitting} onClick={() => goTo(2)}><ArrowLeft size={17} />ย้อนกลับ</button><span>ยังไม่ส่งใบสมัครเข้าระบบ Admin</span></div>
+      <div className="reg-step-footer"><button className="button button-outline" type="button" disabled={submitting} onClick={() => goTo(2)}><ArrowLeft size={17} />ย้อนกลับ</button><span>ยังไม่ส่งใบสมัครจนกว่าจะกดยืนยัน</span></div>
     </>}
 
     {step === 4 && receipt && <section className="reg-complete"><span className="reg-success-icon"><CheckCircle2 size={48} /></span><h3>พร้อมแล้วสำหรับก้าวต่อไป</h3><p>สร้างใบสมัครสำหรับ {displayName(event)} แล้ว<br />โปรดเก็บเลขใบสมัครไว้เพื่อติดตามสถานะและส่งสลิป</p><div className="reg-receipt"><span>เลขที่ใบสมัคร</span><strong>{receipt.reference}</strong><button type="button" className="text-link" onClick={async () => { try { await navigator.clipboard.writeText(receipt.reference); setCopyMessage("คัดลอกเลขที่ใบสมัครแล้ว"); } catch { setCopyMessage("คัดลอกไม่ได้ กรุณาเลือกและคัดลอกเลขด้านบน"); } }}><Copy size={16} />คัดลอกเลขใบสมัคร</button><p role="status">{copyMessage}</p><dl><div><dt>จำนวนผู้สมัคร</dt><dd>{receipt.races.length} คน</dd></div><div><dt>ยอดรวม</dt><dd>฿{price(receipt.amount)}</dd></div><div><dt>สถานะ</dt><dd>รอชำระเงิน</dd></div></dl></div><div className="reg-complete-actions">{receiptSaved && <Link className="button button-primary" href={`/find-order?reference=${encodeURIComponent(receipt.reference)}`}>ดูใบสมัครและส่งสลิป <ChevronRight size={17} /></Link>}<Link className="button button-outline" href={`/events/${event.slug}`}>กลับไปหน้ากิจกรรม</Link></div><p className="reg-complete-note">{expiresAt && `กำหนดชำระ: ${new Date(expiresAt).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })} · `}ค้นหาด้วยเลขใบสมัครและเบอร์โทรผู้ติดต่อ 4 ตัวท้าย</p></section>}

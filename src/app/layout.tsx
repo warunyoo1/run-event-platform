@@ -7,7 +7,9 @@ import "./tokens.css";
 import "./globals.css";
 import "./header.css";
 import "./motion.css";
+import "./start-line.css";
 import { Header, Footer } from "@/components/site-shell";
+import { PublicEventsProvider } from "@/components/public-events-provider";
 import { PageMotion } from "@/components/page-motion";
 
 export const metadata: Metadata = {
@@ -17,5 +19,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="th"><body><a href="#main" className="skip-link">ข้ามไปเนื้อหา</a><Header /><PageMotion>{children}</PageMotion><Footer /></body></html>;
+  return <html lang="th"><body><a href="#main" className="skip-link">ข้ามไปเนื้อหา</a><PublicEventsProvider><Header /><PageMotion>{children}</PageMotion><Footer /></PublicEventsProvider></body></html>;
 }

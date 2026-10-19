@@ -44,13 +44,19 @@ export function OrderLookup({ initialReference = "" }: { initialReference?: stri
   }
   return <div className="lookup-content">
     <form className="lookup-form" onSubmit={search}>
+      <p className="lookup-intro">กรอกข้อมูลที่ใช้สมัคร เพื่อตรวจสอบรายละเอียดและสถานะ</p>
+      <div className="lookup-fields"><div className="lookup-field">
       <label htmlFor="order-reference">เลขที่ใบสมัคร</label>
-      <p id="reference-hint">ใช้เลขใบสมัครและเบอร์โทรผู้ติดต่อ 4 ตัวท้ายเพื่อดูสถานะ</p>
-      <div className="lookup-input"><Search size={19} aria-hidden="true" /><input id="order-reference" value={reference} onChange={(e) => { setReference(e.target.value); setResult(null); }} required maxLength={50} autoComplete="off" aria-describedby="reference-hint" disabled={uploading || pending} /></div>
+      <div className="lookup-input"><FileSearch size={19} aria-hidden="true" /><input id="order-reference" placeholder="กรอกเลขที่ใบสมัคร" value={reference} onChange={(e) => { setReference(e.target.value); setResult(null); }} required maxLength={50} autoComplete="off" aria-describedby="reference-hint" disabled={uploading || pending} /></div>
+      <p id="reference-hint" className="lookup-field-hint">ดูเลขที่ใบสมัครได้จากหน้าสมัครสำเร็จ</p>
+      </div><div className="lookup-field">
       <label htmlFor="order-phone">เบอร์โทรผู้ติดต่อ 4 ตัวท้าย</label>
-      <input id="order-phone" value={phone} onChange={(e) => { setPhone(e.target.value.replace(/\D/g, "").slice(0,4)); setResult(null); }} inputMode="numeric" pattern="[0-9]{4}" maxLength={4} required autoComplete="off" disabled={uploading || pending} />
-      <button className="button button-primary" type="submit" disabled={pending || uploading}>{pending ? "กำลังค้นหา…" : "ค้นหาใบสมัคร"}</button>
+      <input id="order-phone" placeholder="ตัวเลข 4 หลัก" value={phone} onChange={(e) => { setPhone(e.target.value.replace(/\D/g, "").slice(0,4)); setResult(null); }} inputMode="numeric" pattern="[0-9]{4}" maxLength={4} required autoComplete="off" aria-describedby="phone-hint" disabled={uploading || pending} />
+      <p id="phone-hint" className="lookup-field-hint">ใช้เบอร์โทรผู้ติดต่อที่ระบุตอนสมัคร</p>
+      </div></div>
+      <div className="lookup-form-actions"><button className="button button-primary" type="submit" disabled={pending || uploading}><Search size={18} aria-hidden="true" />{pending ? "กำลังค้นหา…" : "ค้นหาใบสมัคร"}</button></div>
     </form>
+    <details className="lookup-help"><summary>จำเลขใบสมัครไม่ได้?</summary><p>ตรวจสอบภาพหน้าจอหรือเลขที่คัดลอกไว้จากหน้าสมัครสำเร็จ หากหาไม่พบ ให้ติดต่อผู้จัดผ่านช่องทางในประกาศงานเพื่อช่วยตรวจสอบ กรุณาอย่าสมัครซ้ำระหว่างรอตรวจสอบ</p><Link className="text-link" href="/events">ค้นหางานที่สมัคร</Link></details>
     {error && <p className="reg-field-error" role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
     {result && <section className="lookup-result"><div className="lookup-result-heading"><FileSearch size={24} aria-hidden="true" /><h2>{result.orderNo}</h2><span className="status-badge">{labels[result.status]}</span></div>

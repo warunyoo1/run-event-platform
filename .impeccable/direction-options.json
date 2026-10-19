@@ -1,0 +1,210 @@
+{
+  "title": "เลือกหน้าตาใหม่ของ Run Event",
+  "question": "สองแนวทางนี้คงความสปอร์ตทันสมัยและขั้นตอนเดิม เลือกแบบที่อยากให้พัฒนาเป็นทั้ง platform",
+  "buildPath": {
+    "value": "code",
+    "toggle": true
+  },
+  "steer": true,
+  "reroll": {
+    "registers": [
+      "safer",
+      "bolder"
+    ]
+  },
+  "options": [
+    {
+      "id": "race-programme",
+      "kind": "assigned",
+      "label": "Race Day — คมชัดแบบโปรแกรมงานวิ่ง",
+      "thesis": "พื้นสว่าง ตัวอักษรเข้ม ภาพนักวิ่งเต็มกรอบ และปุ่มสีส้มอิฐ",
+      "palette": [
+        "#f4f5ef",
+        "#172322",
+        "#bd3b20",
+        "#dbef8a"
+      ],
+      "materials": [
+        "ภาพนักวิ่งจริง",
+        "ตัวอักษรไทยหนา",
+        "เส้นแบ่งบาง"
+      ],
+      "viewport": "ชื่อเรื่องใหญ่ ตามด้วยภาพนักวิ่งและช่องค้นหางานในหน้าจอแรก",
+      "risk": "ตัวอักษรเด่นมาก จึงต้องคุมความยาวชื่อและระยะห่างบนมือถือ",
+      "html": ".impeccable/mocks/decision/race-programme.html",
+      "htmlFrame": "390x844",
+      "comp": ".impeccable/mocks/decision/race-programme.png",
+      "raised": [
+        {
+          "from": "Botanical folio",
+          "raise": "ทุกหน้ามีลำดับข้อมูลและสัดส่วนภาพที่สม่ำเสมอ"
+        },
+        {
+          "from": "Night instruments",
+          "raise": "สถานะสำคัญมีสีเฉพาะและอ่านแยกจากการตกแต่ง"
+        }
+      ]
+    },
+    {
+      "id": "start-line",
+      "kind": "pick",
+      "label": "Start Line — ภาพใหญ่และพลังสนามวิ่ง",
+      "thesis": "เปิดด้วยภาพเต็มพื้นที่บนพื้นดำ ปุ่มเขียวสด ก่อนเข้าสู่รายการงานพื้นขาว",
+      "palette": [
+        "#131c1a",
+        "#d8ed83",
+        "#ffffff",
+        "#53635e"
+      ],
+      "materials": [
+        "ภาพเต็มพื้นที่",
+        "สีเขียวมะนาว",
+        "พื้นขาวสำหรับฟอร์ม"
+      ],
+      "viewport": "ภาพนักวิ่งและหัวเรื่องขาว ช่องค้นหาชัดเจนอยู่เหนือขอบล่างของภาพ",
+      "risk": "คล้ายเว็บแบรนด์กีฬา และต้องระวังข้อความบนภาพให้ชัด",
+      "html": ".impeccable/mocks/decision/start-line.html",
+      "htmlFrame": "390x844",
+      "comp": ".impeccable/mocks/decision/start-line.png"
+    },
+    {
+      "id": "editorial-sequence-montage-botanical-folio-season",
+      "kind": "challenger",
+      "catalogId": "editorial-sequence-montage-botanical-folio-season",
+      "label": "Botanical folio",
+      "verdict": "declined",
+      "thesis": "รายละเอียดเชิงพฤกษศาสตร์ไม่ตรงกับสปอร์ตทันสมัย",
+      "palette": [
+        "#f5efdf",
+        "#33452d",
+        "#b13428"
+      ],
+      "materials": [
+        "แนวทางอ้างอิง"
+      ],
+      "viewport": "ไม่ใช้เป็นภาพรวมหลักของ platform",
+      "risk": "รายละเอียดเชิงพฤกษศาสตร์ไม่ตรงกับสปอร์ตทันสมัย",
+      "case": "รายละเอียดเชิงพฤกษศาสตร์ไม่ตรงกับสปอร์ตทันสมัย",
+      "kept": "ลำดับภาพและคำบรรยายที่เทียบกันได้"
+    },
+    {
+      "id": "kinetic-sand-glyphs",
+      "kind": "challenger",
+      "catalogId": "kinetic-sand-glyphs",
+      "label": "Kinetic sand",
+      "verdict": "declined",
+      "thesis": "วงแหวนและทรายเพิ่มความซับซ้อนให้การสมัครบนมือถือ",
+      "palette": [
+        "#211a13",
+        "#bd8f48",
+        "#be793b"
+      ],
+      "materials": [
+        "แนวทางอ้างอิง"
+      ],
+      "viewport": "ไม่ใช้เป็นภาพรวมหลักของ platform",
+      "risk": "วงแหวนและทรายเพิ่มความซับซ้อนให้การสมัครบนมือถือ",
+      "case": "วงแหวนและทรายเพิ่มความซับซ้อนให้การสมัครบนมือถือ",
+      "kept": "สถานะเลือกที่มีน้ำหนักชัดเจน"
+    },
+    {
+      "id": "medium-native-one-bit-desktop",
+      "kind": "challenger",
+      "catalogId": "medium-native-one-bit-desktop",
+      "label": "One-bit desktop",
+      "verdict": "declined",
+      "thesis": "หน้าตาย้อนยุคขัดกับทิศทางทันสมัย",
+      "palette": [
+        "#ffffff",
+        "#111111"
+      ],
+      "materials": [
+        "แนวทางอ้างอิง"
+      ],
+      "viewport": "ไม่ใช้เป็นภาพรวมหลักของ platform",
+      "risk": "หน้าตาย้อนยุคขัดกับทิศทางทันสมัย",
+      "case": "หน้าตาย้อนยุคขัดกับทิศทางทันสมัย",
+      "kept": "ข้อแตกต่างของสถานะที่ชัด"
+    },
+    {
+      "id": "signals-instruments-night-flight-six-pack",
+      "kind": "challenger",
+      "catalogId": "signals-instruments-night-flight-six-pack",
+      "label": "Night instruments",
+      "verdict": "declined",
+      "thesis": "มาตรวัดทำให้ค้นหางานซับซ้อนโดยไม่เพิ่มข้อมูล",
+      "palette": [
+        "#111916",
+        "#dbedc2",
+        "#da8e25"
+      ],
+      "materials": [
+        "แนวทางอ้างอิง"
+      ],
+      "viewport": "ไม่ใช้เป็นภาพรวมหลักของ platform",
+      "risk": "มาตรวัดทำให้ค้นหางานซับซ้อนโดยไม่เพิ่มข้อมูล",
+      "case": "มาตรวัดทำให้ค้นหางานซับซ้อนโดยไม่เพิ่มข้อมูล",
+      "kept": "ข้อมูลสำคัญอ่านได้ในทันที"
+    },
+    {
+      "id": "craft-making-lowicz-layered-papercut",
+      "kind": "challenger",
+      "catalogId": "craft-making-lowicz-layered-papercut",
+      "label": "Layered papercut",
+      "verdict": "declined",
+      "thesis": "ลวดลายกระดาษแย่งภาพงานและข้อมูลสมัคร",
+      "palette": [
+        "#ffffff",
+        "#da382e",
+        "#26905e"
+      ],
+      "materials": [
+        "แนวทางอ้างอิง"
+      ],
+      "viewport": "ไม่ใช้เป็นภาพรวมหลักของ platform",
+      "risk": "ลวดลายกระดาษแย่งภาพงานและข้อมูลสมัคร",
+      "case": "ลวดลายกระดาษแย่งภาพงานและข้อมูลสมัคร",
+      "kept": "สีแต่ละส่วนมีหน้าที่ชัดเจน"
+    },
+    {
+      "id": "cinema-cinematography-editing-hand-processed-film-bloom",
+      "kind": "challenger",
+      "catalogId": "cinema-cinematography-editing-hand-processed-film-bloom",
+      "label": "Film sequence",
+      "verdict": "declined",
+      "thesis": "ผิวฟิล์มเก่าไม่ตรงกับภาพลักษณ์สปอร์ตคมชัด",
+      "palette": [
+        "#171d19",
+        "#dfb89a",
+        "#c5452d"
+      ],
+      "materials": [
+        "แนวทางอ้างอิง"
+      ],
+      "viewport": "ไม่ใช้เป็นภาพรวมหลักของ platform",
+      "risk": "ผิวฟิล์มเก่าไม่ตรงกับภาพลักษณ์สปอร์ตคมชัด",
+      "case": "ผิวฟิล์มเก่าไม่ตรงกับภาพลักษณ์สปอร์ตคมชัด",
+      "kept": "การครอปภาพที่เล่าเรื่องการวิ่ง"
+    }
+  ],
+  "canon": true,
+  "canonCard": {
+    "kind": "canon",
+    "label": "คงโครงสร้างที่คุ้นเคย",
+    "thesis": "เว็บค้นหางานสีน้ำเงินพื้นขาวที่เรียบและเป็นกลาง",
+    "palette": [
+      "#ffffff",
+      "#182b40",
+      "#1666ba"
+    ],
+    "materials": [
+      "ตารางและการ์ด",
+      "ภาพงาน"
+    ],
+    "viewport": "หัวเรื่อง ช่องค้นหา และรายการงาน",
+    "risk": "เปลี่ยนภาพลักษณ์จากเดิมน้อยกว่าอีกสองแบบ",
+    "html": ".impeccable/mocks/decision/canon.html",
+    "htmlFrame": "390x844",
+    "comp": ".impeccable/mocks/decision/canon.png"
+  }
+}

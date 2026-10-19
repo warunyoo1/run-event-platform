@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Bookmark, ClipboardList, Footprints, House, Info, Menu, Search, X } from "lucide-react";
+import { ArrowUpRight, ClipboardList, Footprints, House, Info, Menu, Search, X } from "lucide-react";
 import { gsap, motionAllowed, useGSAP } from "@/lib/motion";
 
 const navigation = [
@@ -76,7 +76,6 @@ export function Header() {
         })}
       </nav>
       <div className="header-actions">
-        <Link className={`saved-link ${pathname === "/saved" ? "active" : ""}`} href="/saved" aria-label="งานที่บันทึก" aria-current={pathname === "/saved" ? "page" : undefined} onClick={() => setMenuOpen(false)}><Bookmark size={18} aria-hidden="true" /><span>งานที่บันทึก</span></Link>
         <button ref={menuButtonRef} className="menu-toggle icon-button" aria-label={menuOpen ? "ปิดเมนู" : "เปิดเมนู"} aria-controls="main-navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={21} /> : <Menu size={21} />}</button>
       </div>
     </div>
