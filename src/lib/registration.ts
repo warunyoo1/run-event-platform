@@ -8,14 +8,14 @@ export const provinces = ["กรุงเทพมหานคร", "กระ�
 export type ParticipantDraft = {
   firstName: string; lastName: string; gender: string;
   birthDay: string; birthMonth: string; birthYear: string;
-  nationality: string; identity: string; declineIdentity: boolean;
+  nationality: string; identity: string; declineIdentity: boolean; identityReference: string;
   email: string; phone: string; medical: string; blood: string;
   emergencyName: string; emergencyRelation: string; emergencyPhone: string;
   race: string; size: string; province: string; team: string; applicantType: string;
 };
 export const emptyParticipant = (): ParticipantDraft => ({
   firstName: "", lastName: "", gender: "", birthDay: "", birthMonth: "", birthYear: "",
-  nationality: "ไทย", identity: "", declineIdentity: false, email: "", phone: "",
+  nationality: "ไทย", identity: "", declineIdentity: false, identityReference: "", email: "", phone: "",
   medical: "", blood: "", emergencyName: "", emergencyRelation: "", emergencyPhone: "",
   race: "", size: "", province: "", team: "", applicantType: "บุคคลทั่วไป",
 });

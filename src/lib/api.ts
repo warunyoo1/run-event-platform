@@ -31,7 +31,7 @@ export type CreatedOrder = { orderNo: string; status: "pending"; amount: { subto
 export type PublicOrder = Omit<CreatedOrder, "status" | "expiresAt"> & {
   status: "pending" | "slip_uploaded" | "paid" | "rejected" | "expired" | "cancelled";
   event: { slug: string; name: string; date: string; venue: string } | null;
-  races: { race: string; size: string }[]; delivery: "pickup" | "shipping"; createdAt: string;
+  races: { race: string; size: string; identityReference?: string }[]; delivery: "pickup" | "shipping"; createdAt: string;
   expiresAt?: string; rejectionReason?: string; canUploadSlip: boolean;
 };
 export const createOrder = (slug: string, participants: ParticipantDraft[], delivery: DeliveryDraft) => publicRequest<CreatedOrder>(`/events/${encodeURIComponent(slug)}/orders`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ participants, delivery }) });

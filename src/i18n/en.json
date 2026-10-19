@@ -501,5 +501,8 @@
   "ระยะวิ่งและขนาดเสื้อที่ต้องการ": "Your preferred distance and shirt size",
   "ที่อยู่จัดส่ง หากเลือกรับทางไปรษณีย์": "A delivery address if you choose shipping",
   "สมัครไว้แล้ว?": "Already registered?",
-  "ใช้เลขใบสมัครและเบอร์โทรผู้ติดต่อ 4 ตัวท้าย": "Use your registration number and the last 4 digits of your contact phone."
+  "ใช้เลขใบสมัครและเบอร์โทรผู้ติดต่อ 4 ตัวท้าย": "Use your registration number and the last 4 digits of your contact phone.",
+  "รหัสอ้างอิงผู้สมัคร": "Runner reference",
+  "หากไม่ประสงค์ให้ข้อมูล ระบบจะสร้างรหัสอ้างอิงผู้สมัครหลังยืนยันสมัคร": "If you choose not to provide ID, a runner reference will be generated after you confirm registration.",
+  "รหัสนี้จะบันทึกเมื่อยืนยันสมัคร ไม่ใช่เลขบัตรประชาชนหรือพาสปอร์ต": "This reference is saved when you confirm registration. It is not an ID or passport number."
 }
