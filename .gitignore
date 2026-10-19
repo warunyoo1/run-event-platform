@@ -41,3 +41,6 @@ artifacts/
 
 # agent working files (task reports); skills stay tracked
 .agents/tasks/
+
+# Local UI review screenshots (not needed for deployment)
+.impeccable/review/

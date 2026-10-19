@@ -13,10 +13,12 @@
     "@fontsource/noto-sans-thai": "^5.2.0",
     "@gsap/react": "^2.1.2",
     "gsap": "^3.15.0",
+    "i18next": "^26.5.2",
     "lucide-react": "^0.468.0",
     "next": "^16.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-i18next": "^17.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

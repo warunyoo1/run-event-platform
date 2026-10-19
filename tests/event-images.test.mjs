@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import vm from "node:vm";
 import test from "node:test";
 import React from "react";
+import { localeComponents } from "./render-i18n.mjs";
 import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 
@@ -12,8 +13,8 @@ const compiled = ts.transpileModule(readFileSync(file, "utf8"), {
   compilerOptions: { jsx: ts.JsxEmit.ReactJSX, module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
 }).outputText;
 const exports = {};
-vm.runInNewContext(compiled, { exports, require: createRequire(file) });
-const render = (images) => renderToStaticMarkup(React.createElement(exports.EventImageSections, { event: { images } }));
+vm.runInNewContext(compiled, { exports, require: (name) => name === "@/i18n/client" ? localeComponents : createRequire(file)(name) });
+const render = (images) => renderToStaticMarkup(React.createElement(localeComponents.LocaleProvider, null, React.createElement(exports.EventImageSections, { event: { images } })));
 const picture = (kind, id, sortOrder = 0) => ({ kind, id, sortOrder, alt: "", url: `/images/${id}.jpg` });
 
 test("detail includes every secondary image kind, with stable order and full-size links", () => {

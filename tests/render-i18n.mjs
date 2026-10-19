@@ -1,0 +1,12 @@
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import vm from "node:vm";
+import ts from "typescript";
+const file = new URL("../src/i18n/client.tsx", import.meta.url);
+const translateFile = new URL("../src/i18n/translate.ts", import.meta.url);
+const translated = ts.transpileModule(readFileSync(translateFile, "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true } }).outputText;
+const translateExports = {};
+vm.runInNewContext(translated, { exports: translateExports, require: createRequire(translateFile) });
+const compiled = ts.transpileModule(readFileSync(file, "utf8"), { compilerOptions: { jsx: ts.JsxEmit.ReactJSX, module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true } }).outputText;
+export const localeComponents = {};
+vm.runInNewContext(compiled, { exports: localeComponents, require: (name) => name === "./translate" ? translateExports : createRequire(file)(name) });

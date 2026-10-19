@@ -1,3 +1,4 @@
+import { LocaleProvider, UiText } from "@/i18n/client";
 import type { Metadata } from "next";
 import "@fontsource/noto-sans-thai/400.css";
 import "@fontsource/noto-sans-thai/500.css";
@@ -19,5 +20,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="th"><body><a href="#main" className="skip-link">ข้ามไปเนื้อหา</a><PublicEventsProvider><Header /><PageMotion>{children}</PageMotion><Footer /></PublicEventsProvider></body></html>;
+  return <html lang="th"><body><LocaleProvider><a href="#main" className="skip-link"><UiText>ข้ามไปเนื้อหา</UiText></a><PublicEventsProvider><Header /><PageMotion>{children}</PageMotion><Footer /></PublicEventsProvider></LocaleProvider></body></html>;
 }

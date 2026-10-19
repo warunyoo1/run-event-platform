@@ -604,3 +604,94 @@ body .reg-toast-action { color: var(--accent); }
 
 .race-awards th, .race-awards td { width: 33.333%; text-align: center; }
 .race-awards .award-amount { text-align: center; }
+
+.site-header .header-actions { display: flex; }
+
+/* Event card facts use a shared reading column in both languages. */
+.event-card .card-facts { display: grid; gap: 14px; align-items: start; }
+.card-info-row { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 16px; line-height: 1.6; color: var(--ink); }
+.card-info-row > svg { color: var(--icon); margin-top: 4px; }
+.card-event-date { font-weight: 600; }
+.card-info-copy { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.card-info-label, .card-info-copy small { color: var(--muted); font-size: 14px; font-weight: 400; }
+.event-card .card-races { margin: 18px 0 0; }
+.event-card .card-theme { margin: 10px 0 0; font-size: 14px; }
+.event-card .card-availability { margin: 14px 0 18px; }
+.event-card .card-body h3 { text-wrap: initial; word-break: normal; overflow-wrap: break-word; }
+.registration-help { padding-block: 52px 72px; }
+.registration-help-intro { padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+.registration-help-intro h1 { font-size: clamp(30px, 3.4vw, 42px); line-height: 1.4; font-weight: 700; }
+.registration-help-intro p { margin-top: 12px; font-size: 18px; line-height: 1.8; color: var(--muted); max-width: 65ch; }
+.registration-help-layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 64px; align-items: start; margin-top: 40px; }
+.registration-help-steps { list-style: none; padding: 0; margin: 0; }
+.registration-help-steps > li { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 20px; padding-bottom: 32px; position: relative; }
+.registration-help-steps > li:not(:last-child)::before { content: ""; position: absolute; left: 20px; top: 42px; bottom: 0; width: 1px; background: var(--line-strong); }
+.registration-help-number { display: grid; place-items: center; width: 42px; height: 42px; background: var(--blue-soft); color: var(--blue-dark); border-radius: 50%; font-size: 18px; font-weight: 600; }
+.registration-help-steps h2 { font-size: 21px; line-height: 1.6; margin: 3px 0 8px; font-weight: 600; }
+.registration-help-steps p { font-size: 17px; line-height: 1.85; color: var(--muted); max-width: 65ch; }
+.registration-help-steps .registration-help-tip { display: flex; gap: 9px; align-items: flex-start; margin-top: 14px; font-size: 15px; color: var(--blue-dark); }
+.registration-help-tip svg { margin-top: 5px; }
+.registration-help-aside { background: var(--surface); padding: 28px; border-radius: 14px; }
+.registration-help-aside h2 { font-size: 21px; font-weight: 600; }
+.registration-help-aside ul { margin: 20px 0 24px; padding: 0; list-style: none; display: grid; gap: 14px; }
+.registration-help-aside li { display: flex; align-items: flex-start; gap: 9px; color: var(--muted); font-size: 16px; line-height: 1.7; }
+.registration-help-aside li svg { color: var(--blue); margin-top: 4px; }
+.registration-help-aside > .button { width: 100%; }
+.registration-help-existing { border-top: 1px solid var(--line); padding-top: 24px; margin-top: 28px; }
+.registration-help-existing h3 { font-size: 18px; margin-bottom: 8px; }
+.registration-help-existing p { color: var(--muted); font-size: 15px; line-height: 1.8; }
+.registration-help-existing .text-link { margin-top: 8px; font-size: 15px; }
+@media (max-width: 850px) { .registration-help-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+@media (max-width: 600px) {
+ .registration-help { padding-block: 32px 48px; }
+ .registration-help-intro { padding-bottom: 24px; }
+ .registration-help-intro p { font-size: 16px; }
+ .registration-help-layout { margin-top: 28px; }
+ .registration-help-steps > li { grid-template-columns: 36px minmax(0, 1fr); gap: 14px; padding-bottom: 28px; }
+ .registration-help-number { width: 36px; height: 36px; font-size: 16px; }
+ .registration-help-steps > li:not(:last-child)::before { left: 17px; top: 36px; }
+ .registration-help-steps h2 { font-size: 19px; margin-top: 0; }
+ .registration-help-steps p { font-size: 16px; }
+ .registration-help-aside { padding: 24px; }
+}
+/* Registration: compact progress, readable two-column form groups. */
+.registration-page.container { width: min(1080px, calc(100% - 64px)); padding-top: 32px; padding-bottom: 56px; }
+body .reg-event-heading h1 { font-size: clamp(25px, 2.5vw, 34px); line-height: 1.5; max-width: 100%; }
+.reg-demo-notice { margin-bottom: 24px; }
+body .reg-progress { padding: 22px 32px; background: var(--surface-subtle); color: var(--ink); border-bottom: 1px solid var(--line); }
+body .reg-progress-title { font-size: 17px; }
+body .reg-progress ol { margin-top: 16px; gap: 16px; }
+body .reg-progress li { flex-direction: row; align-items: center; justify-content: flex-start; text-align: left; gap: 10px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+body .reg-progress li:not(:last-child)::after { display: none; }
+body .reg-progress .reg-step-number { width: 34px; height: 34px; flex-shrink: 0; font-size: 15px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--muted); }
+body .reg-progress li.is-current { color: var(--blue-dark); font-weight: 600; }
+body .reg-progress .is-current .reg-step-number { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+body .reg-progress li.is-complete { color: var(--blue-dark); }
+body .reg-progress .is-complete .reg-step-number { background: var(--blue-soft); color: var(--blue-dark); border-color: var(--line-strong); }
+body .reg-content { padding: 32px 36px 0; }
+.reg-section-heading { align-items: flex-end; padding-bottom: 24px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+body .reg-section-heading h2 { font-size: 25px; line-height: 1.5; }
+.reg-form-heading { margin-bottom: 24px; }
+.reg-group { margin-bottom: 36px; }
+.reg-group > legend { width: 100%; font-size: 18px; padding-bottom: 12px; margin-bottom: 20px; }
+.reg-group + .reg-group { padding-top: 24px; border-top: 1px solid var(--line); }
+.reg-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.reg-field > label, .reg-birth > legend { color: var(--ink); font-size: 16px; }
+.reg-field input:not([type="checkbox"]), .reg-field select { min-height: 50px; font-size: 16px; border-radius: 8px; }
+.reg-step-footer { gap: 20px; }
+@media (max-width: 600px) {
+ .registration-page.container { width: calc(100% - 32px); padding-top: 24px; }
+ body .reg-event-heading h1 { font-size: 25px; }
+ body .reg-progress { padding: 20px 18px; }
+ body .reg-progress ol { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 10px; }
+ body .reg-progress li { font-size: 13px; gap: 8px; }
+ body .reg-progress .reg-step-number { width: 30px; height: 30px; font-size: 14px; }
+ body .reg-content { padding: 24px 18px 0; }
+ body .reg-section-heading h2 { font-size: 22px; }
+ .reg-section-heading { padding-bottom: 20px; gap: 12px; }
+ .reg-fields { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+ .reg-group { margin-bottom: 28px; }
+ .reg-group + .reg-group { padding-top: 20px; }
+ .reg-birth > div { gap: 6px; grid-template-columns: .8fr 1.25fr 1fr; }
+ .reg-birth .reg-field select { padding-inline: 6px; }
+}

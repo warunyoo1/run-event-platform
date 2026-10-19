@@ -40,3 +40,17 @@
   .saved-link { width: 44px; padding: 10px; }
   .saved-link span { display: none; }
 }
+
+.language-switch { display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; padding: 3px; border: 1px solid #53635b; border-radius: 8px; }
+.language-switch button { min-width: 40px; min-height: 36px; padding: 5px 8px; border-radius: 5px; font-size: 14px; color: #e0e8df; line-height: 1.3; }
+.language-switch button[aria-pressed="true"] { color: #17231e; background: #d8ed83; font-weight: 600; }
+.language-switch button:hover { background: #34453a; color: #fff; }
+.language-switch button[aria-pressed="true"]:hover { background: #d8ed83; color: #17231e; }
+@media (max-width: 600px) {
+ .header-inner .header-actions { gap: 8px; }
+ .language-switch button { min-width: 34px; padding-inline: 5px; font-size: 13px; }
+ .site-header .header-inner .brand { font-size: 19px; gap: 6px; }
+ .site-header .header-inner { gap: 8px; }
+}
+html[lang="en"] .main-nav a { font-size: 14px; }
+html[lang="en"] .race-comparison th, html[lang="en"] .race-comparison td { overflow-wrap: normal; word-break: normal; }

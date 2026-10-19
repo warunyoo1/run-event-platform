@@ -164,3 +164,5 @@ chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
 - `CORS_ORIGINS` ไม่ต้องเพิ่ม origin ของเว็บนี้ เพราะ browser เรียก `/api/v1/public/*` แบบ same-origin (Next rewrite ไปที่ API) และฝั่ง server เรียก API ตรง (`src/lib/api.ts`) จะต้องเพิ่มก็ต่อเมื่อให้ browser เรียก API โดยตรง
 - `API_PROXY_TARGET` (build arg) ต้องเป็น URL สาธารณะของ API: `https://api.walkruntogive2027.com`
 - ถ้า API อยู่หลัง nginx ที่จำกัดขนาด body ให้รองรับการอัปโหลดสลิป
+### Platform languages
+The platform uses react-i18next with a local Thai/English UI dictionary in `src/i18n/en.json`. The header switch persists the selected language in localStorage and synchronizes browser tabs. Translation changes labels only; form option values and participant data remain unchanged. Dates use Buddhist years in Thai and Gregorian years in English. Organizer-authored names, descriptions, venues, policy text, and poster images remain in their original language. Add new UI copy to the dictionary and render it through UiText / translated controls. Unknown text falls back to the original.
