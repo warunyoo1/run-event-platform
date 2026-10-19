@@ -30,10 +30,10 @@
   --radius: 12px;
   --focus-on-dark: #ffffff;
   /* Thai-first type scale: 14px is the floor for body-level Thai text, 13px only for non-essential labels. */
-  --fs-xs: 13px;
-  --fs-sm: 14px;
-  --fs-base: 15px;
-  --fs-md: 16px;
+  --fs-xs: 15px;
+  --fs-sm: 16px;
+  --fs-base: 17px;
+  --fs-md: 18px;
   --font-thai: "Noto Sans Thai", "Leelawadee UI", Tahoma, "Segoe UI", sans-serif;
   /* Numerals and the baht sign (฿) come from a Thai-capable font, never bare Arial. */
   --font-num: "Noto Sans Thai", "Leelawadee UI", Tahoma, Arial, sans-serif;

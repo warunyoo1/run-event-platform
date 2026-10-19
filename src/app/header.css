@@ -1,6 +1,6 @@
 .site-header { position: sticky; top: 0; z-index: 40; background: var(--surface); border-bottom: 1px solid var(--line); box-shadow: 0 2px 12px rgb(24 43 64 / 3%); }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 84px; }
-.header-inner .brand { gap: 11px; font-size: 24px; }
+.header-inner .brand { gap: 11px; font-size: 26px; }
 .header-inner .brand-icon { width: 40px; height: 43px; }
 .main-nav { display: flex; align-items: center; justify-content: center; gap: 8px; margin-inline: auto; }
 .main-nav a { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 10px 14px; border-radius: 7px; color: var(--muted); font-size: var(--fs-sm); font-weight: 500; line-height: 1.6; white-space: nowrap; }
@@ -16,7 +16,7 @@
   .header-inner { gap: 16px; }
   .main-nav { gap: 4px; }
   .main-nav a { gap: 7px; padding-inline: 11px; font-size: var(--fs-sm); }
-  .header-inner .brand { font-size: 22px; }
+  .header-inner .brand { font-size: 24px; }
   .saved-link { padding-inline: 12px; }
 }
 @media (max-width: 1020px) {
@@ -31,7 +31,7 @@
 }
 @media (max-width: 600px) {
   .header-inner { min-height: 72px; gap: 12px; }
-  .header-inner .brand { gap: 9px; font-size: 22px; }
+  .header-inner .brand { gap: 9px; font-size: 24px; }
   .header-inner .brand-icon { width: 35px; height: 38px; }
   .header-inner .brand-icon svg { width: 22px; }
   .main-nav { right: 16px; width: calc(100% - 32px); }
