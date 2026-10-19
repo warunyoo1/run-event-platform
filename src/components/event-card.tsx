@@ -18,7 +18,7 @@ export function EventCard({ event }: {
       <div className="card-facts">
         <div className="card-info-row card-event-date"><CalendarDays size={17} aria-hidden="true"/><time dateTime={event.date}><UiText>{formatDate(event.date)}</UiText></time></div>
         <div className="card-info-row"><MapPin size={17} aria-hidden="true"/><div className="card-info-copy"><span className="card-info-label"><UiText>ชื่อสถานที่:</UiText></span><span>{event.venue}</span>{event.province && <small><UiText>{event.province}</UiText></small>}</div></div>
-        {event.startPoint?.trim() && <div className="card-info-row"><Flag size={17} aria-hidden="true"/><div className="card-info-copy"><span className="card-info-label"><UiText>จุดปล่อยตัว:</UiText></span><span>{event.startPoint}</span></div></div>}
+        {event.startPoint?.trim() && <div className="card-info-row"><Flag size={17} aria-hidden="true"/><div className="card-start-inline"><span className="card-info-label"><UiText>จุดปล่อยตัว:</UiText></span>{" "}<span>{event.startPoint}</span></div></div>}
       </div>
       <div className="card-races"><span className="event-category"><UiText>{categoryLabels[event.category]}</UiText></span><div className="distance-tags"><UiText>{event.races.map((race) => <span key={race.name}>{race.name}</span>)}</UiText></div></div>
       <UiText>{themeLabels[event.theme] && <p className="card-theme"><UiText>{"ธีมสี: "}</UiText><UiText>{themeLabels[event.theme]}</UiText></p>}</UiText>
