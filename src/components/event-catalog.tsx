@@ -52,7 +52,7 @@ export function EventCatalog({ home = false, savedOnly = false }: {
         }, scope);
         return () => media.revert();
     }, { scope, dependencies: [resultKey, view], revertOnUpdate: true });
-    const Heading = home ? "h2" : "h1";
+    const Heading = "h1";
     return <section className={`catalog container ${home ? "home-catalog" : "page-catalog"}`} id="discover" ref={scope}><div className="section-heading"><div><Heading className={home ? "section-title" : "page-title"}><UiText>{savedOnly ? "งานวิ่งที่คุณบันทึกไว้" : home ? "ค้นหาเส้นทางครั้งต่อไป" : "ค้นหางานวิ่ง"}</UiText></Heading><p><UiText>{savedOnly ? "รวมงานที่สนใจไว้ในที่เดียว พร้อมเมื่อไหร่ก็กลับมาดูได้" : "งานวิ่งทั่วไทย เลือกได้ตามสไตล์ของคุณ"}</UiText></p></div><UiText>{home && <Link href="/events" className="text-link"><UiText>{"งานวิ่งทั้งหมด "}</UiText><ArrowRight size={18}/></Link>}</UiText></div>
     <UiText>{loading && <p role="status"><UiText>{"กำลังโหลดงานวิ่ง\u2026 "}</UiText></p>}</UiText><UiText>{loadError && <div role="alert"><p><UiText>{loadError}</UiText></p><button className="button button-outline" onClick={() => retry()}><UiText>{"ลองอีกครั้ง "}</UiText></button></div>}</UiText>
     <UiText>{events.length > 0 && <>
