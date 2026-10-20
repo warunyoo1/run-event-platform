@@ -236,6 +236,23 @@ body .reg-toast-action { color: var(--accent); }
 .events-list .event-card { display: block; }
 .events-list .event-card .card-link { display: grid; grid-template-columns: 300px minmax(0, 1fr); }
 .events-list .event-card .event-poster { height: auto; align-self: start; }
+@media (min-width: 1001px) {
+  .events-list .event-card .card-link { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+  .events-list .event-card .event-poster:has(> img) { position: relative; height: auto; }
+  .events-list .event-card .event-poster > img { height: auto; object-fit: contain; }
+  .events-list .event-poster:has(> img)::before, .events-list .event-poster:has(> img)::after { display: none; }
+  .events-list .event-card .card-body { padding: 18px 22px 0; align-self: stretch; }
+  .events-list .event-card .card-body h3 { font-size: 20px; line-height: 1.45; margin-bottom: 12px; }
+  .events-list .event-card .card-facts { gap: 8px; }
+  .events-list .card-info-copy { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+  .events-list .event-card .card-races { margin-top: 12px; }
+  .events-list .event-card .card-theme { margin-top: 6px; }
+  .events-list .event-card .card-availability { margin: 10px 0; }
+  .events-list .event-card .card-bottom { padding-block: 12px; }
+}
+@media (min-width: 601px) and (max-width: 1000px) {
+  .events-list .event-card .card-link { display: flex; }
+}
 @media (max-width: 600px) {
   .event-card .card-body { padding: 20px 20px 0; }
   .event-card .card-body h3 { font-size: 21px; }

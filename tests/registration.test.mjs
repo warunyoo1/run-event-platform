@@ -43,9 +43,11 @@ test("demo receipt contains no participant contact, identity, birthday, health o
   assert.equal(provinces.length, 77);
 });
 
-test("event names show Buddhist Era years only", () => {
-  assert.equal(displayName(events[0]), "Bangkok Morning Run 2570");
-  for (const e of events) assert.doesNotMatch(displayName(e), /\b20\d{2}\b/);
+test("event names preserve organizer-authored years in both languages", () => {
+  for (const name of ["WALK–RUN TO GIVE 2027", "งานวิ่ง 2570", "Run 1999 / 2027"]) {
+    assert.equal(displayName({ name }), name);
+    assert.equal(displayName({ name }, "en"), name);
+  }
 });
 
 

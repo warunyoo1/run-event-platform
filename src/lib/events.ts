@@ -33,8 +33,8 @@ export const categoryLabels = { road: "วิ่งถนน", trail: "วิ่
 export const formatDate = (value: string, full = false) => new Intl.DateTimeFormat("th-TH", {
   day: "numeric", month: full ? "long" : "short", year: "numeric", timeZone: "Asia/Bangkok",
 }).format(new Date(`${value}T12:00:00+07:00`));
-// Thai UI shows Buddhist Era only: convert any Gregorian year inside an event name (e.g. "Run 2027" -> "Run 2570").
-export const displayName = (event: Pick<RunningEvent, "name">, language = "th") => language === "en" ? event.name : event.name.replace(/\b(19|20)\d{2}\b/g, (year) => String(Number(year) + 543));
+// Event titles are organizer-authored text; preserve years in either language.
+export const displayName = (event: Pick<RunningEvent, "name">, _language = "th") => event.name;
 export const price = (value: number) => new Intl.NumberFormat("th-TH").format(value);
 
 export type EventFilters = { query: string; province: string; month: string; distance: string; category: string; status: string };
