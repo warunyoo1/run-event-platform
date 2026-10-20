@@ -203,7 +203,7 @@ body .reg-toast-action { color: var(--accent); }
 /* Event discovery cards: photo first, compact facts, explicit next action. */
 .event-card { display: flex; flex-direction: column; border: 0; }
 .event-card .card-link { display: flex; flex-direction: column; height: 100%; color: inherit; }
-.event-card .event-poster:has(> img) { padding: 0; width: 100%; background: var(--surface-subtle); aspect-ratio: 16 / 9; }
+.event-card .event-poster:has(> img) { padding: 0; width: 100%; background: var(--surface-subtle); aspect-ratio: auto; }
 .event-card .event-poster > img { display: block; }
 .event-card .status-badge { top: 14px; left: 14px; padding: 5px 10px; border: 0; border-radius: 6px; font-size: 14px; }
 .event-card .save-button { top: 12px; right: 12px; width: 44px; height: 44px; box-shadow: none; border: 1px solid var(--line); }
@@ -235,7 +235,7 @@ body .reg-toast-action { color: var(--accent); }
 .event-card .card-link:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; border-radius: 14px; }
 .events-list .event-card { display: block; }
 .events-list .event-card .card-link { display: grid; grid-template-columns: 300px minmax(0, 1fr); }
-.events-list .event-card .event-poster { height: 100%; }
+.events-list .event-card .event-poster { height: auto; align-self: start; }
 @media (max-width: 600px) {
   .event-card .card-body { padding: 20px 20px 0; }
   .event-card .card-body h3 { font-size: 21px; }

@@ -22,7 +22,7 @@ export function EventPoster({ event, large = false }: {
     const images = [...(event.images ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
     const cover = images.find((image) => image.kind === "cover") ?? images.find((image) => image.kind === "poster") ?? images[0];
     if (cover && !failed)
-        return <div className={`event-poster poster-${event.theme} ${large ? "poster-large" : ""}`}><UiImg src={cover.url} alt={cover.alt || event.name} onError={() => setFailed(true)} style={{ width: "100%", height: "100%", objectFit: "cover" }}/></div>;
+        return <div className={`event-poster poster-${event.theme} ${large ? "poster-large" : ""}`}><UiImg src={cover.url} alt={cover.alt || event.name} onError={() => setFailed(true)} style={{ width: "100%", height: large ? "100%" : "auto", objectFit: large ? "cover" : "contain" }}/></div>;
     const text = { title: event.name, subtitle: new Intl.DateTimeFormat("th-TH", { month: "long", year: "numeric", timeZone: "Asia/Bangkok" }).format(new Date(`${event.date}T12:00:00+07:00`)) };
     return <div className={`event-poster poster-${event.theme} ${large ? "poster-large" : ""}`} aria-hidden="true">
     <div className="poster-top"><span>Run Event presents</span></div>
