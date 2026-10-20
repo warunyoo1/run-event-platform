@@ -449,7 +449,7 @@ body .reg-toast-action { color: var(--accent); }
 .detail-page .detail-title h1 { font-size: clamp(28px, 3vw, 40px); line-height: 1.4; text-wrap: pretty; }
 .detail-page .detail-title .status-badge { margin-bottom: 12px; border: 0; }
 .detail-page .detail-grid { grid-template-columns: minmax(0, 1fr) 340px; gap: 32px; }
-.detail-main > .event-poster:has(> img) { padding: 0; background: var(--surface-subtle); aspect-ratio: 16 / 10; border-radius: 14px; }
+.detail-main > .event-poster:has(> img) { padding: 0; background: var(--surface-subtle); aspect-ratio: auto; border-radius: 14px; }
 .detail-main > .event-poster > img { display: block; }
 .detail-page .event-summary { border: 0; padding: 26px; top: 96px; }
 .summary-heading { font-size: 23px; font-weight: 600; margin-bottom: 22px; }
