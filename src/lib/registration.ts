@@ -8,7 +8,7 @@ export const provinces = ["กรุงเทพมหานคร", "กระ�
 export type ParticipantDraft = {
   firstName: string; lastName: string; gender: string;
   birthDay: string; birthMonth: string; birthYear: string;
-  nationality: string; identity: string; declineIdentity: boolean; identityReference: string;
+  nationality: string; otherNationality?: string; identity: string; declineIdentity: boolean; identityReference: string;
   email: string; phone: string; medical: string; blood: string;
   emergencyName: string; emergencyRelation: string; emergencyPhone: string;
   race: string; size: string; province: string; team: string; applicantType: string;
@@ -39,6 +39,7 @@ export function validateParticipant(draft: ParticipantDraft, event: RunningEvent
   const dateString = `${draft.birthYear}-${draft.birthMonth.padStart(2, "0")}-${draft.birthDay.padStart(2, "0")}`;
   if (!year || !month || !day || year < 1900 || birth.getUTCFullYear() !== year || birth.getUTCMonth() !== month - 1 || birth.getUTCDate() !== day || dateString > today) errors.birthDate = "กรุณาเลือกวันเกิดที่ถูกต้องและไม่อยู่ในอนาคต";
   if (!draft.nationality) errors.nationality = "กรุณาเลือกสัญชาติ";
+  if (draft.nationality === "อื่น ๆ" && !draft.otherNationality?.trim()) errors.otherNationality = "กรุณาระบุสัญชาติ";
   if (!validPhone(draft.phone)) errors.phone = "กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง เช่น 0812345678";
   if (draft.email.trim() && !validEmail(draft.email)) errors.email = "กรุณากรอกอีเมลให้ถูกต้อง";
   if (draft.emergencyPhone.trim() && !validPhone(draft.emergencyPhone)) errors.emergencyPhone = "กรุณาตรวจสอบเบอร์ผู้ติดต่อฉุกเฉิน";

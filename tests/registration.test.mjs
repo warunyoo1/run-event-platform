@@ -47,3 +47,12 @@ test("event names show Buddhist Era years only", () => {
   assert.equal(displayName(events[0]), "Bangkok Morning Run 2570");
   for (const e of events) assert.doesNotMatch(displayName(e), /\b20\d{2}\b/);
 });
+
+
+test("other nationality requires a nonblank custom value", () => {
+  const draft = { ...participant(), nationality: "อื่น ๆ" };
+  assert.equal(validateParticipant(draft, event).otherNationality, "กรุณาระบุสัญชาติ");
+  assert.ok(validateParticipant({ ...draft, otherNationality: "   " }, event).otherNationality);
+  assert.equal(validateParticipant({ ...draft, otherNationality: "ออสเตรเลีย" }, event).otherNationality, undefined);
+  assert.equal(validateParticipant({ ...draft, nationality: "ไทย" }, event).otherNationality, undefined);
+});
