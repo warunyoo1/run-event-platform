@@ -4,6 +4,7 @@ import { UiInput, UiText } from '@/i18n/client';
 import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { FileSearch, Search, Upload } from "lucide-react";
+import { BankPaymentDetails } from "./bank-payment-details";
 import { OrderResult } from "./order-result";
 import { findOrder, sendSlip, type PublicOrder } from "@/lib/api";
 export function OrderLookup({ initialReference = "" }: {
@@ -95,6 +96,6 @@ export function OrderLookup({ initialReference = "" }: {
     <UiText>{error && <p className="reg-field-error" role="alert"><UiText>{error}</UiText></p>}</UiText>
     <UiText>{notice && <p role="status"><UiText>{notice}</UiText></p>}</UiText>
     <UiText>{result && <OrderResult result={result}>
-      <UiText>{result.canUploadSlip && <form className="slip-upload-form" onSubmit={upload}><h3><UiText>{"ส่งหลักฐานการชำระเงิน "}</UiText></h3><p><UiText>{"กรุณาตรวจสอบช่องทางรับชำระกับผู้จัด ขณะนี้หน้าเว็บยังไม่แสดง QR หรือบัญชีรับเงิน "}</UiText></p><label className="slip-file-field"><span><Upload size={24} aria-hidden="true"/><strong><UiText>{file ? file.name : "เลือกภาพสลิป"}</UiText></strong><small><UiText>{"JPG, PNG หรือ WEBP \u00B7 ไม่เกิน 5 MB "}</UiText></small></span><UiInput ref={input} type="file" aria-label="เลือกภาพสลิป" accept="image/jpeg,image/png,image/webp" required disabled={uploading} onChange={(e) => setFile(e.target.files?.[0] ?? null)}/></label><button className="button button-primary" disabled={!file || uploading} type="submit"><Upload size={16} aria-hidden="true"/><UiText>{uploading ? "กำลังส่ง…" : "ส่งสลิป"}</UiText></button></form>}</UiText>
+      <UiText>{result.canUploadSlip && <form className="slip-upload-form" onSubmit={upload}><h3><UiText>{"ส่งหลักฐานการชำระเงิน "}</UiText></h3><BankPaymentDetails/><label className="slip-file-field"><span><Upload size={24} aria-hidden="true"/><strong><UiText>{file ? file.name : "เลือกภาพสลิป"}</UiText></strong><small><UiText>{"JPG, PNG หรือ WEBP \u00B7 ไม่เกิน 5 MB "}</UiText></small></span><UiInput ref={input} type="file" aria-label="เลือกภาพสลิป" accept="image/jpeg,image/png,image/webp" required disabled={uploading} onChange={(e) => setFile(e.target.files?.[0] ?? null)}/></label><button className="button button-primary" disabled={!file || uploading} type="submit"><Upload size={16} aria-hidden="true"/><UiText>{uploading ? "กำลังส่ง…" : "ส่งสลิป"}</UiText></button></form>}</UiText>
       </OrderResult>}</UiText></div>;
 }

@@ -506,5 +506,11 @@
   "หากไม่ประสงค์ให้ข้อมูล ระบบจะสร้างรหัสอ้างอิงผู้สมัครหลังยืนยันสมัคร": "If you choose not to provide ID, a runner reference will be generated after you confirm registration.",
   "รหัสนี้จะบันทึกเมื่อยืนยันสมัคร ไม่ใช่เลขบัตรประชาชนหรือพาสปอร์ต": "This reference is saved when you confirm registration. It is not an ID or passport number.",
   "ระบุสัญชาติ": "Specify nationality",
-  "กรุณาระบุสัญชาติ": "Please specify your nationality"
+  "กรุณาระบุสัญชาติ": "Please specify your nationality",
+  "ชำระเงินผ่านบัญชีธนาคาร": "Pay by bank transfer",
+  "ธนาคาร": "Bank",
+  "ธนาคารออมสิน": "Government Savings Bank",
+  "เลขบัญชี": "Account number",
+  "หลังยืนยันใบสมัคร กรุณาโอนตามยอดในใบสมัคร แล้วส่งหลักฐานการชำระเงิน": "After confirming your registration, transfer the amount shown on your order and upload your payment slip.",
+  "แผนที่": "Maps"
 }

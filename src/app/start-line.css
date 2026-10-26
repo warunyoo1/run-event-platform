@@ -201,6 +201,13 @@ body .reg-toast-action { color: var(--accent); }
 @media (max-width: 600px) { .hero-search { grid-template-columns: minmax(0, 1fr); } .hero-search .hero-query { grid-column: auto; } }
 
 /* Event discovery cards: photo first, compact facts, explicit next action. */
+.bank-payment-details { padding-block: 20px; margin-block: 16px; border-block: 1px solid var(--line); }
+.bank-payment-details h3 { margin: 0 0 14px; font-size: 18px; }
+.bank-payment-details dl { display: grid; gap: 12px; margin: 0; }
+.bank-payment-details dt { color: var(--muted); font-size: 14px; }
+.bank-payment-details dd { margin: 4px 0 0; font-weight: 600; }
+.bank-payment-details .bank-account-number { font-size: 24px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; user-select: all; }
+.bank-payment-details p { margin: 14px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
 .event-card { display: flex; flex-direction: column; border: 0; }
 .event-card .card-link { display: flex; flex-direction: column; height: 100%; color: inherit; }
 .event-card .event-poster:has(> img) { padding: 0; width: 100%; background: var(--surface-subtle); aspect-ratio: auto; }
