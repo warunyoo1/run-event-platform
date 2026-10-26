@@ -512,5 +512,6 @@
   "ธนาคารออมสิน": "Government Savings Bank",
   "เลขบัญชี": "Account number",
   "หลังยืนยันใบสมัคร กรุณาโอนตามยอดในใบสมัคร แล้วส่งหลักฐานการชำระเงิน": "After confirming your registration, transfer the amount shown on your order and upload your payment slip.",
-  "แผนที่": "Maps"
+  "แผนที่": "Maps",
+  "ผู้จัดยังไม่ได้เพิ่มรูปแผนที่เส้นทางสำหรับงานนี้": "The organizer has not added a route map for this event yet."
 }
