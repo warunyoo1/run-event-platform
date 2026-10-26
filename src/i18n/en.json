@@ -513,5 +513,12 @@
   "เลขบัญชี": "Account number",
   "หลังยืนยันใบสมัคร กรุณาโอนตามยอดในใบสมัคร แล้วส่งหลักฐานการชำระเงิน": "After confirming your registration, transfer the amount shown on your order and upload your payment slip.",
   "แผนที่": "Maps",
-  "ผู้จัดยังไม่ได้เพิ่มรูปแผนที่เส้นทางสำหรับงานนี้": "The organizer has not added a route map for this event yet."
+  "ผู้จัดยังไม่ได้เพิ่มรูปแผนที่เส้นทางสำหรับงานนี้": "The organizer has not added a route map for this event yet.",
+  "แนบหลักฐานการชำระเงิน (ถ้ามี)": "Attach payment slip (optional)",
+  "สลิปจะถูกส่งเมื่อกดยืนยันใบสมัคร หรือส่งภายหลังผ่านหน้าค้นหาใบสมัครได้": "Your slip will be uploaded when you confirm your registration. You can also upload it later through order lookup.",
+  "ยืนยันใบสมัครและส่งสลิป": "Confirm registration and upload slip",
+  "กำลังสร้างใบสมัครและส่งข้อมูล…": "Creating registration and uploading…",
+  "เลือกไฟล์ JPG, PNG หรือ WEBP ที่ไม่ว่างเปล่า ขนาดไม่เกิน 5 MB": "Choose a non-empty JPG, PNG or WEBP file up to 5 MB.",
+  "สร้างใบสมัครแล้ว แต่ยอดค่าสมัครเปลี่ยนแปลง กรุณาตรวจสอบยอดและส่งสลิปผ่านหน้าค้นหาใบสมัคร": "Registration created, but the amount changed. Please check your total and upload the slip through order lookup.",
+  "สร้างใบสมัครแล้ว แต่ส่งสลิปไม่สำเร็จ กรุณาเก็บเลขใบสมัครและส่งสลิปอีกครั้งผ่านหน้าค้นหาใบสมัคร": "Registration created, but the slip upload failed. Keep your order number and retry through order lookup."
 }

@@ -5,11 +5,11 @@ import { BankPaymentDetails } from "./bank-payment-details";
 import { RegistrationLeaveGuard } from "./registration-leave-guard";
 import Link from "next/link";
 import { useEffect, useRef, useState, type HTMLInputTypeAttribute } from "react";
-import { ArrowLeft, ArrowRight, CalendarDays, Check, CheckCircle2, ChevronRight, ClipboardList, Copy, MapPin, Pencil, Plus, Shirt, Trash2, Truck, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, Check, CheckCircle2, ChevronRight, ClipboardList, Copy, MapPin, Pencil, Plus, Shirt, Trash2, Truck, Upload, UserRound } from "lucide-react";
 import { raceAvailability, displayName, formatDate, price, type RunningEvent } from "@/lib/events";
 import { MAX_PARTICIPANTS, SHIPPING_FEE, emptyDelivery, emptyParticipant, provinces, registrationTotal, shirtSizes, validateDelivery, validateParticipant, type DeliveryDraft, type DemoReceipt, type FieldErrors, type ParticipantDraft } from "@/lib/registration";
 import { addressDistricts, addressSubdistricts, updateAddress } from "@/lib/thai-address";
-import { createOrder, PublicApiError } from "@/lib/api";
+import { createOrder, sendSlip, PublicApiError } from "@/lib/api";
 import { gsap, motionAllowed, smoothScrollTo, useGSAP } from "@/lib/motion";
 type Option = string | {
     value: string;
@@ -64,6 +64,9 @@ export function RegistrationForm({ event, currentYear }: {
     const [receiptSaved, setReceiptSaved] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [expiresAt, setExpiresAt] = useState("");
+    const [paymentSlip, setPaymentSlip] = useState<File | null>(null);
+    const [slipSent, setSlipSent] = useState(false);
+    const [slipNotice, setSlipNotice] = useState("");
     const [copyMessage, setCopyMessage] = useState("");
     const [announcement, setAnnouncement] = useState("");
     const [undo, setUndo] = useState<{
@@ -210,6 +213,19 @@ export function RegistrationForm({ event, currentYear }: {
         try {
             const created = await createOrder(event.slug, participants, delivery);
             setReceipt({ reference: created.orderNo, eventSlug: event.slug, races: participants.map(({ race, size }) => ({ race, size })), amount: created.amount.total, delivery: delivery.method, createdAt: new Date().toISOString(), status: created.status });
+            if (paymentSlip) {
+                if (created.amount.total !== totals.total) {
+                    setSlipNotice("สร้างใบสมัครแล้ว แต่ยอดค่าสมัครเปลี่ยนแปลง กรุณาตรวจสอบยอดและส่งสลิปผ่านหน้าค้นหาใบสมัคร");
+                } else {
+                    try {
+                        await sendSlip(created.orderNo, delivery.phone.replace(/[\s()-]/g, "").slice(-4), paymentSlip);
+                        setSlipSent(true);
+                    } catch {
+                        setSlipNotice("สร้างใบสมัครแล้ว แต่ส่งสลิปไม่สำเร็จ กรุณาเก็บเลขใบสมัครและส่งสลิปอีกครั้งผ่านหน้าค้นหาใบสมัคร");
+                    }
+                }
+                setPaymentSlip(null);
+            }
             setExpiresAt(created.expiresAt);
             setReceiptSaved(true);
             goTo(4);
@@ -303,7 +319,13 @@ export function RegistrationForm({ event, currentYear }: {
     <UiText>{step === 3 && <>
       <UiText>{errorSummary()}</UiText>
       <div className="reg-review-grid"><div><div className="reg-list-heading"><h3><UiText>{"รายชื่อผู้สมัคร "}</UiText><span><UiText>{participants.length}</UiText><UiText>{"คน "}</UiText></span></h3><button className="text-link" type="button" disabled={submitting} onClick={() => goTo(1)}><Pencil size={15}/><UiText>{"แก้ไข "}</UiText></button></div><UiText>{participantList(false)}</UiText><section className="reg-contact-review"><div className="reg-list-heading"><h3><UiText>{"ข้อมูลติดต่อและรับอุปกรณ์ "}</UiText></h3><button className="text-link" type="button" disabled={submitting} onClick={() => goTo(2)}><Pencil size={15}/><UiText>{"แก้ไข "}</UiText></button></div><p>{delivery.contact} · {delivery.phone}</p><p>{delivery.method === "shipping" ? `${delivery.street} ${delivery.subdistrict} ${delivery.district} ${delivery.province} ${delivery.postalCode}` : "รับอุปกรณ์ด้วยตนเองตามประกาศของผู้จัด"}</p></section></div>
-      <aside className="reg-payment"><h3><UiText>{"สรุปยอดค่าสมัคร "}</UiText></h3><UiText>{totalSummary()}</UiText><BankPaymentDetails/><label className="reg-checkbox"><input type="checkbox" checked={acknowledged} onChange={(e) => { setAcknowledged(e.target.checked); setGeneralError(""); }}/><span><UiText>{"ฉันตรวจสอบข้อมูลผู้สมัครและข้อมูลติดต่อถูกต้องแล้ว "}</UiText></span></label><button className="button button-primary" type="button" disabled={submitting} onClick={complete}><UiText>{submitting ? "กำลังสร้างใบสมัคร…" : "ยืนยันใบสมัคร"}</UiText> <ChevronRight size={18}/></button></aside></div>
+      <aside className="reg-payment"><h3><UiText>{"สรุปยอดค่าสมัคร "}</UiText></h3><UiText>{totalSummary()}</UiText><BankPaymentDetails/><section className="reg-payment-slip"><h3><UiText>แนบหลักฐานการชำระเงิน (ถ้ามี)</UiText></h3><p><UiText>สลิปจะถูกส่งเมื่อกดยืนยันใบสมัคร หรือส่งภายหลังผ่านหน้าค้นหาใบสมัครได้</UiText></p><label className="slip-file-field"><span><Upload size={24} aria-hidden="true"/><strong>{paymentSlip ? paymentSlip.name : <UiText>เลือกภาพสลิป</UiText>}</strong><small><UiText>JPG, PNG หรือ WEBP · ไม่เกิน 5 MB</UiText></small></span><input type="file" aria-label="เลือกภาพสลิป" accept="image/jpeg,image/png,image/webp" disabled={submitting} onChange={e => {
+          const file = e.target.files?.[0] ?? null;
+          if (file && (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || !file.size || file.size > 5 * 1024 * 1024)) {
+            setPaymentSlip(null); e.target.value = ""; setSlipNotice("เลือกไฟล์ JPG, PNG หรือ WEBP ที่ไม่ว่างเปล่า ขนาดไม่เกิน 5 MB"); return;
+          }
+          setPaymentSlip(file); setSlipNotice("");
+        }}/></label>{slipNotice && <p role="alert"><UiText>{slipNotice}</UiText></p>}</section><label className="reg-checkbox"><input type="checkbox" checked={acknowledged} onChange={(e) => { setAcknowledged(e.target.checked); setGeneralError(""); }}/><span><UiText>{"ฉันตรวจสอบข้อมูลผู้สมัครและข้อมูลติดต่อถูกต้องแล้ว "}</UiText></span></label><button className="button button-primary" type="button" disabled={submitting} onClick={complete}><UiText>{submitting ? "กำลังสร้างใบสมัครและส่งข้อมูล…" : paymentSlip ? "ยืนยันใบสมัครและส่งสลิป" : "ยืนยันใบสมัคร"}</UiText> <ChevronRight size={18}/></button></aside></div>
       <div className="reg-step-footer"><button className="button button-outline" type="button" disabled={submitting} onClick={() => goTo(2)}><ArrowLeft size={17}/><UiText>{"ย้อนกลับ "}</UiText></button><span><UiText>{"ยังไม่ส่งใบสมัครจนกว่าจะกดยืนยัน "}</UiText></span></div>
     </>}</UiText>
 
@@ -313,7 +335,7 @@ export function RegistrationForm({ event, currentYear }: {
     }
     catch {
         setCopyMessage("คัดลอกไม่ได้ กรุณาเลือกและคัดลอกเลขด้านบน");
-    } }}><Copy size={16}/><UiText>{"คัดลอกเลขใบสมัคร "}</UiText></button><p role="status"><UiText>{copyMessage}</UiText></p><dl><div><dt><UiText>{"จำนวนผู้สมัคร "}</UiText></dt><dd><UiText>{receipt.races.length}</UiText><UiText>{"คน "}</UiText></dd></div><div><dt><UiText>{"ยอดรวม "}</UiText></dt><dd><UiText>{"฿ "}</UiText><UiText>{price(receipt.amount)}</UiText></dd></div><div><dt><UiText>{"สถานะ "}</UiText></dt><dd><UiText>{"รอชำระเงิน "}</UiText></dd></div></dl></div><BankPaymentDetails/><div className="reg-complete-actions"><UiText>{receiptSaved && <Link className="button button-primary" href={`/find-order?reference=${encodeURIComponent(receipt.reference)}`}><UiText>{"ดูใบสมัครและส่งสลิป "}</UiText><ChevronRight size={17}/></Link>}</UiText><Link className="button button-outline" href={`/events/${event.slug}`}><UiText>{"กลับไปหน้ากิจกรรม "}</UiText></Link></div><p className="reg-complete-note"><UiText>{expiresAt && `กำหนดชำระ: ${new Date(expiresAt).toLocaleString(language === "en" ? "en-GB" : "th-TH", { timeZone: "Asia/Bangkok" })} · `}</UiText><UiText>{"ค้นหาด้วยเลขใบสมัครและเบอร์โทรผู้ติดต่อ 4 ตัวท้าย "}</UiText></p></section>}</UiText>
+    } }}><Copy size={16}/><UiText>{"คัดลอกเลขใบสมัคร "}</UiText></button><p role="status"><UiText>{copyMessage}</UiText></p><dl><div><dt><UiText>{"จำนวนผู้สมัคร "}</UiText></dt><dd><UiText>{receipt.races.length}</UiText><UiText>{"คน "}</UiText></dd></div><div><dt><UiText>{"ยอดรวม "}</UiText></dt><dd><UiText>{"฿ "}</UiText><UiText>{price(receipt.amount)}</UiText></dd></div><div><dt><UiText>{"สถานะ "}</UiText></dt><dd><UiText>{slipSent ? "ส่งสลิปแล้ว รอเจ้าหน้าที่ตรวจสอบ" : "รอชำระเงิน"}</UiText></dd></div></dl></div>{slipNotice && <p role="alert"><UiText>{slipNotice}</UiText></p>}{!slipSent && <BankPaymentDetails/>}<div className="reg-complete-actions"><UiText>{receiptSaved && <Link className="button button-primary" href={`/find-order?reference=${encodeURIComponent(receipt.reference)}`}><UiText>{"ดูใบสมัครและส่งสลิป "}</UiText><ChevronRight size={17}/></Link>}</UiText><Link className="button button-outline" href={`/events/${event.slug}`}><UiText>{"กลับไปหน้ากิจกรรม "}</UiText></Link></div><p className="reg-complete-note"><UiText>{expiresAt && `กำหนดชำระ: ${new Date(expiresAt).toLocaleString(language === "en" ? "en-GB" : "th-TH", { timeZone: "Asia/Bangkok" })} · `}</UiText><UiText>{"ค้นหาด้วยเลขใบสมัครและเบอร์โทรผู้ติดต่อ 4 ตัวท้าย "}</UiText></p></section>}</UiText>
 
     </div></div>
   </div>;
